@@ -43,6 +43,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .tstats{display:grid;grid-template-columns:auto auto;gap:1px 12px;justify-content:start}
 .tstats i{font-style:normal;color:var(--orange);letter-spacing:1px}
 .tip em{font-style:normal}
+.tip span.theavy{color:var(--ink)}
+.tip span.theavy b{font-family:var(--mono);font-size:1em;color:#ffd23f}
 .plate b{color:var(--c)}
 .plate small{color:var(--dim);font-family:var(--mono);font-size:.72em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .timer{position:absolute;right:2%;top:4%;font-size:clamp(11px,1.7vw,17px);color:var(--dim);font-variant-numeric:tabular-nums;text-shadow:2px 2px 0 #000}
@@ -94,13 +96,13 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
         <div class="prow"><b id="hName">Lucas</b><small id="hWeapon">sem arma</small></div>
         <div class="php"><i id="hpFill"></i></div>
       </div>
-      <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><em><kbd>E</kbd> pegar</em></div>
+      <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><span class="theavy" id="tipHeavy"></span><em><kbd>E</kbd> pegar</em></div>
       <div class="timer" id="timer">0m 00s</div>
       <div class="overlay" id="titleScreen">
         <h2>Escolha seu <span>herói</span></h2>
         <div class="picks" id="picks"></div>
         <button id="startBtn">Jogar</button>
-        <p class="dim pickHint"><kbd>←</kbd><kbd>→</kbd> ou <kbd>1</kbd>–<kbd>5</kbd> escolhem · <kbd>Enter</kbd> começa<br><kbd>A</kbd><kbd>D</kbd> andar · <kbd>Espaço</kbd>/<kbd>W</kbd> pular (2x no ar) · <kbd>J</kbd>/clique atacar · <kbd>Shift</kbd> rolar (desvia de ataques) · <kbd>E</kbd> pegar arma · <kbd>S</kbd>+<kbd>Espaço</kbd> descer da madeira · <kbd>F</kbd> tela cheia · <kbd>Esc</kbd> pausa</p>
+        <p class="dim pickHint"><kbd>←</kbd><kbd>→</kbd> ou <kbd>1</kbd>–<kbd>5</kbd> escolhem · <kbd>Enter</kbd> começa<br><kbd>A</kbd><kbd>D</kbd> andar · <kbd>Espaço</kbd>/<kbd>W</kbd> pular (2x no ar) · <kbd>J</kbd>/clique atacar (no arco, o clique mira) · <kbd>K</kbd>/botão direito ataque carregado · <kbd>Shift</kbd> rolar (desvia de ataques) · <kbd>E</kbd> pegar arma · <kbd>S</kbd>+<kbd>Espaço</kbd> descer da madeira · <kbd>F</kbd> tela cheia · <kbd>Esc</kbd> pausa</p>
       </div>
       <div class="overlay" id="pauseScreen" hidden>
         <h2>Pausado</h2>
@@ -398,6 +400,8 @@ CHARS.forEach(c => { c.weapon = () => {}; c.fists = false; });
 const WEAPONS = {
   espada: {
     name: 'Espada Enferrujada', desc: 'Rápida. Combo de 3 golpes; o último é mais forte.', tint: '#dfe8ef', idle: 50,
+    heavyName: 'Corte Carregado', heavyDesc: 'avança e corta com força.',
+    heavy: { wind: 34, act: 7, rec: 22, dmg: 34, reach: 30, up: 10, kb: 5.5, step: 4, stop: 9, shake: 6, arc: [-170, 90], pw: 'windup', pa: 'attack', pr: 'slam' },
     stats: [['Dano', 2], ['Velocidade', 3], ['Alcance', 2]],
     combo: [
       { wind: 5, act: 5, rec: 11, dmg: 9, reach: 21, up: 4, kb: 1.6, step: 1.2, stop: 3, shake: 1, arc: [-100, 50], pw: 'windup', pa: 'attack', pr: 'attack' },
@@ -407,10 +411,22 @@ const WEAPONS = {
   },
   martelo: {
     name: 'Martelo Pesado', desc: 'Lento, mas cada golpe esmaga e empurra para longe.', tint: '#c3ccd4', idle: 25,
+    heavyName: 'Terremoto', heavyDesc: 'esmaga o chão e atinge dos dois lados.',
+    heavy: { wind: 48, act: 8, rec: 30, dmg: 62, reach: 42, up: 20, kb: 7, step: 1, stop: 11, shake: 9, arc: [-175, 90], pw: 'windup', pa: 'attack', pr: 'slam', slam: true, both: true, quake: true },
     stats: [['Dano', 3], ['Velocidade', 1], ['Alcance', 3]],
     combo: [
       { wind: 16, act: 6, rec: 18, dmg: 23, reach: 27, up: 12, kb: 4.5, step: 1.6, stop: 6, shake: 4, arc: [-150, 70], pw: 'windup', pa: 'attack', pr: 'slam', slam: true },
       { wind: 18, act: 7, rec: 22, dmg: 31, reach: 28, up: 14, kb: 5.5, step: 2.2, stop: 7, shake: 5, arc: [-160, 75], pw: 'windup', pa: 'attack', pr: 'slam', slam: true },
+    ],
+  },
+  arco: {
+    name: 'Arco Simples', desc: 'Ataca de longe. Clique para mirar com o mouse; J atira para frente.', tint: '#e6d2a0', idle: 70,
+    heavyName: 'Flecha Perfurante', heavyDesc: 'atravessa todos os bugs no caminho.',
+    heavy: { ranged: true, wind: 42, act: 1, rec: 16, dmg: 34, kb: 4, stop: 6, shake: 3, speed: 9, pierce: true, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    stats: [['Dano', 1], ['Velocidade', 2], ['Alcance', 3]],
+    // ranged: em vez de golpe, solta uma flecha no fim da preparação (wind)
+    combo: [
+      { ranged: true, wind: 12, act: 1, rec: 10, dmg: 12, kb: 1.2, stop: 2, shake: 0, speed: 6, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     ],
   },
 };
@@ -424,6 +440,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const low = document.createElement('canvas'); low.width = W; low.height = H;
 const lc = low.getContext('2d');
 const view = document.getElementById('view'); const vc = view.getContext('2d');
+const stageEl = document.getElementById('stage');
 function resize() {
   const r = view.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 3);
@@ -592,26 +609,17 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
 // (a colisão é ligada à parte; no desenho pré-renderizado o corredor aparece aberto)
 const GATE = { tx: 44, y0: 22, y1: 29, lift: 0, open: false };
 function setGate(closed) { for (let y = GATE.y0; y <= GATE.y1; y++) map[y][GATE.tx] = closed ? SOLID : AIR; }
-const PEDESTALS = [[12, 30, 'espada'], [20, 30, 'martelo']];
+const PEDESTALS = [[12, 30, 'espada'], [22, 30, 'martelo'], [32, 30, 'arco']];
 const ENEMY_SPOTS = [[58, 30], [69, 30], [96, 30], [120, 14], [158, 34], [173, 34], [218, 22], [228, 22]];
 
-// ---------- luz e vinheta
+// ---------- brilho suave (porta e armas nos pedestais)
 function radial(r, stops) {
   const c = document.createElement('canvas'); c.width = c.height = r * 2;
   const x = c.getContext('2d'), g = x.createRadialGradient(r, r, 0, r, r, r);
   stops.forEach(([o, col]) => g.addColorStop(o, col));
   x.fillStyle = g; x.fillRect(0, 0, r * 2, r * 2); return c;
 }
-const HOLE = radial(64, [[0, 'rgba(0,0,0,1)'], [.5, 'rgba(0,0,0,.7)'], [1, 'rgba(0,0,0,0)']]);
-const GLOW_G = radial(64, [[0, 'rgba(95,255,170,.55)'], [.4, 'rgba(47,209,122,.18)'], [1, 'rgba(47,209,122,0)']]);
 const GLOW_O = radial(64, [[0, 'rgba(255,170,80,.6)'], [.45, 'rgba(245,128,30,.2)'], [1, 'rgba(245,128,30,0)']]);
-const dark = document.createElement('canvas'); dark.width = W; dark.height = H;
-const dc = dark.getContext('2d');
-const VIG = document.createElement('canvas'); VIG.width = W; VIG.height = H;
-(() => {
-  const x = VIG.getContext('2d'), g = x.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, W * .62);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.6)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-})();
 
 // ---------- som
 let AC = null, soundOn = true;
@@ -655,6 +663,12 @@ const sfx = {
   alert() { tone(900, .05, 'square', .03); tone(1300, .06, 'square', .03, 0, .05); },
   warn() { tone(520, .1, 'sawtooth', .03, 260); },
   bite() { noise(.12, .1, 3000); tone(380, .08, 'square', .03, -200); },
+  draw() { tone(180, .18, 'triangle', .025, 120); },
+  charge(d) { tone(160, d, 'sawtooth', .03, 640); tone(320, d, 'triangle', .02, 1100); },
+  ready() { tone(1320, .06, 'square', .04); tone(1760, .08, 'square', .03, 0, .05); },
+  big() { noise(.45, .22, 900); tone(80, .45, 'triangle', .12, -40); },
+  twang() { tone(620, .09, 'triangle', .05, -380); noise(.06, .05, 6000); },
+  thunk() { noise(.06, .08, 1200); tone(240, .05, 'square', .025, -100); },
   pickup() { [523, 784, 1046].forEach((f, i) => tone(f, .1, 'square', .045, 0, i * .07)); },
   gate() { noise(.8, .14, 400); tone(70, .7, 'sawtooth', .05, 20); },
   die() { [392, 330, 262, 196].forEach((f, i) => tone(f, .24, 'triangle', .06, 0, i * .16)); },
@@ -677,16 +691,17 @@ const RUN = 1.9, ACC_G = .38, ACC_A = .24, FRIC = .34;
 const GRAV = .32, JUMP = 4.7, JUMP2 = 4.2, MAXFALL = 6;
 const COYOTE = 6, BUFFER = 7, ROLL_T = 20, ROLL_SPD = 3.4, ROLL_CD = 28;
 const pl = { x: 0, y: 0, w: 10, h: 28, vx: 0, vy: 0, face: 1, ground: false, coyote: 0, buf: 0, jumps: 0, cut: false, roll: 0, rollCd: 0, drop: 0, anim: 0, land: 0, safe: null,
-  hp: 100, max: 100, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, combo: 0, comboT: 0 };
+  hp: 100, max: 100, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0 };
 let heroIdx = 0, T = 0, mode = 'title', playT = 0, fade = 0, exitT = 0, deadT = 0, hitstop = 0, shake = 0, hurtFx = 0;
-let enemies = [], items = [], nums = [];
+let enemies = [], items = [], nums = [], arrows = [];
+let aimPt = null, mouseScr = null;   // aimPt: ponto do mapa clicado para atacar; mouseScr: mouse na tela (para desenhar a mira)
 // teletransporte na porta: brilha, estica num raio de luz e some
 const EXIT_GLOW = 24, EXIT_GONE = 40, EXIT_END = 75;
 const cam = { x: 0, y: 0, look: 0, floor: 0 };
 
 function resetPlayer() {
   Object.assign(pl, { x: START.x, y: START.y - pl.h, vx: 0, vy: 0, face: 1, ground: false, roll: 0, rollCd: 0, drop: 0, jumps: 0, buf: 0, safe: { x: START.x, y: START.y - pl.h },
-    hp: pl.max, inv: 0, hurt: 0, atk: null, atkBuf: 0, combo: 0, comboT: 0 });
+    hp: pl.max, inv: 0, hurt: 0, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0 });
   snapCam();
 }
 
@@ -695,8 +710,13 @@ const held = act => {
   if (act === 'left') return keys.has('a') || keys.has('arrowleft');
   if (act === 'right') return keys.has('d') || keys.has('arrowright');
   if (act === 'down') return keys.has('s') || keys.has('arrowdown');
-  if (act === 'jump') return keys.has(' ') || keys.has('w') || keys.has('arrowup') || keys.has('k');
+  if (act === 'jump') return keys.has(' ') || keys.has('w') || keys.has('arrowup');
 };
+let lastDir = 0;
+function inputDir() {
+  const r = held('right'), l = held('left');
+  return r && l ? lastDir : r ? 1 : l ? -1 : 0;
+}
 const onPlat = () => {
   const by = Math.floor((pl.y + pl.h) / TS);
   let p = false;
@@ -741,12 +761,13 @@ function jump(v, double) {
 }
 
 function updatePlayer() {
-  const dir = (held('right') ? 1 : 0) - (held('left') ? 1 : 0);
+  const dir = inputDir();
   if (pl.rollCd > 0) pl.rollCd--;
   if (pl.drop > 0) pl.drop--;
   if (pl.land > 0) pl.land--;
   if (pl.inv > 0) pl.inv--;
   if (pl.atkBuf > 0) pl.atkBuf--;
+  if (pl.heavyBuf > 0) pl.heavyBuf--;
   if (pl.comboT > 0) pl.comboT--;
 
   if (pl.roll > 0) {
@@ -805,29 +826,86 @@ function updatePlayer() {
 
 function roll() {
   if (mode !== 'play' || pl.roll > 0 || pl.rollCd > 0 || pl.hurt > 0) return;
-  const dir = (held('right') ? 1 : 0) - (held('left') ? 1 : 0);
+  const dir = inputDir();
   if (dir) pl.face = dir;
   pl.roll = ROLL_T; pl.rollCd = ROLL_T + ROLL_CD; pl.atk = null; sfx.roll();
   dust(pl.x + pl.w / 2, pl.y + pl.h, 5, -pl.face);
 }
 
 // ---------- ataque do herói
-function startAttack(i) {
+function startAttack(i, heavy) {
   const w = WEAPONS[pl.weapon];
   i %= w.combo.length;
-  pl.atk = { s: w.combo[i], i, f: 0, hit: new Set() }; pl.atkBuf = 0;
+  // arco + clique: vira e mira no ponto clicado; o resto golpeia para onde o herói está virado
+  let aim = 0;
+  if (aimPt && w.combo[0].ranged) {
+    const dx = aimPt.x - (pl.x + pl.w / 2), dy = aimPt.y - (pl.y + 10);
+    if (Math.abs(dx) > 2) pl.face = dx < 0 ? -1 : 1;
+    aim = Math.atan2(dy, Math.abs(dx)) * 180 / Math.PI;
+  }
+  const s = heavy ? w.heavy : w.combo[i];
+  pl.atk = { s, i, f: 0, hit: new Set(), aim, heavy: !!heavy }; pl.atkBuf = 0; pl.heavyBuf = 0; aimPt = null;
+  if (heavy) sfx.charge(s.wind / 60); else if (s.ranged) sfx.draw();
+}
+// carregando: faíscas puxadas para o herói; perto do fim, um brilho avisa que está pronto
+function chargeFx(a) {
+  const s = a.s, cx = pl.x + pl.w / 2, cy = pl.y + 12, col = WEAPONS[pl.weapon].tint;
+  if (a.f % 2 === 0) { const an = rand(0, Math.PI * 2), d = rand(12, 20); addP(cx + Math.cos(an) * d, cy + Math.sin(an) * d, -Math.cos(an) * d / 10, -Math.sin(an) * d / 10, 10, ['#ffffff', '#ffd23f', col]); }
+  if (a.f === s.wind - 8) { burst(cx, cy, 12, ['#ffffff', '#ffd23f'], 1.6, 0, [8, 14]); sfx.ready(); }
+}
+function shootArrow(a) {
+  const s = a.s, r = a.aim * Math.PI / 180, ox = pl.x + pl.w / 2 + pl.face * 6, oy = pl.y + 12;
+  arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * s.speed, vy: Math.sin(r) * s.speed, s, life: 90, stuck: 0, hit: new Set(), heavy: a.heavy });
+  if (a.heavy) { sfx.big(); burst(ox, oy, 10, ['#ffffff', '#ffd23f'], 1.6); shake = Math.max(shake, 2); }
+  sfx.twang();
+}
+function updateArrows() {
+  arrows.forEach(ar => {
+    if (ar.stuck) { ar.stuck--; return; }
+    ar.life--;
+    // dois passos por quadro para não atravessar paredes finas nem bugs
+    for (let k = 0; k < 2 && ar.life > 0; k++) {
+      ar.x += ar.vx / 2; ar.y += ar.vy / 2;
+      if (tile(Math.floor(ar.x / TS), Math.floor(ar.y / TS)) === SOLID) {
+        ar.stuck = 50; ar.life = 0; sfx.thunk();
+        burst(ar.x, ar.y, 5, DUST, 1, .05, [6, 12]);
+        return;
+      }
+      const e = enemies.find(o => !o.dead && !ar.hit.has(o) && ar.x > o.x - 2 && ar.x < o.x + o.w + 2 && ar.y > o.y - 7 && ar.y < o.y + o.h + 2);
+      if (e) {
+        ar.hit.add(e); hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1);
+        if (!ar.s.pierce) { ar.life = 0; ar.gone = true; return; }   // a perfurante segue em frente
+      }
+    }
+    ar.vy += .05;
+    if (ar.life > 0 && (ar.heavy || T % 2 === 0)) addP(ar.x - ar.vx * .6, ar.y - ar.vy * .6, 0, 0, ar.heavy ? 12 : 6, ar.heavy ? ['#ffffff', '#ffd23f', '#f5801e'] : ['#fff6d8', '#e6d2a0']);
+  });
+  arrows = arrows.filter(ar => !ar.gone && (ar.life > 0 || ar.stuck > 0) && ar.y < MH * TS + 20);
 }
 function updateAttack() {
   if (!pl.weapon || pl.roll > 0 || pl.hurt > 0) return;
   const a = pl.atk;
-  if (!a) { if (pl.atkBuf > 0) startAttack(pl.comboT > 0 ? pl.combo : 0); return; }
-  const s = a.s, len = WEAPONS[pl.weapon].combo.length, nextI = (a.i + 1) % len;
+  if (!a) {
+    if (pl.heavyBuf > 0) startAttack(0, true);
+    else if (pl.atkBuf > 0) startAttack(pl.comboT > 0 ? pl.combo : 0);
+    return;
+  }
+  const s = a.s, len = WEAPONS[pl.weapon].combo.length, nextI = a.heavy ? 0 : (a.i + 1) % len;
   a.f++;
-  if (a.f === s.wind) { (s.slam ? sfx.heavy : sfx.swing)(); if (pl.ground) pl.vx = pl.face * s.step; }
-  if (a.f >= s.wind && a.f < s.wind + s.act) hitCheck(a);
+  if (a.heavy && a.f < s.wind) chargeFx(a);
+  if (s.ranged) { if (a.f === s.wind) shootArrow(a); }
+  else {
+    if (a.f === s.wind) { (s.slam ? sfx.heavy : sfx.swing)(); if (a.heavy) sfx.big(); if (pl.ground) pl.vx = pl.face * s.step; }
+    if (a.f >= s.wind && a.f < s.wind + s.act) hitCheck(a);
+  }
   if (s.slam && a.f === s.wind + s.act - 1 && pl.ground) {
     const gx = pl.x + pl.w / 2 + pl.face * (s.reach - 6);
     dust(gx, pl.y + pl.h, 10, pl.face); dust(gx, pl.y + pl.h, 6, -pl.face); shake = Math.max(shake, 2);
+    if (s.quake) {
+      // onda de choque no chão para os dois lados
+      const fx = pl.x + pl.w / 2, fy = pl.y + pl.h;
+      for (let d = 6; d <= s.reach; d += 4) [-1, 1].forEach(sd => { dust(fx + sd * d, fy, 2, sd); addP(fx + sd * d, fy - 1, sd * rand(.2, .6), rand(-2.4, -1), irand(14, 24), ['#d8cdbf', '#a8998a', '#7d6e62'], .18, 2); });
+    }
   }
   // apertar de novo durante a recuperação emenda o próximo golpe do combo
   if (a.f >= s.wind + s.act && pl.atkBuf > 0 && nextI !== 0) { startAttack(nextI); return; }
@@ -835,6 +913,7 @@ function updateAttack() {
 }
 function atkBox(s) {
   const cx = pl.x + pl.w / 2;
+  if (s.both) return { x: cx - s.reach, y: pl.y - s.up, w: s.reach * 2, h: pl.h + s.up };
   return { x: pl.face > 0 ? cx - 4 : cx - s.reach, y: pl.y - s.up, w: s.reach + 4, h: pl.h + s.up };
 }
 function hitCheck(a) {
@@ -865,7 +944,13 @@ const WHITE_PAL = { shell: '#fff', hi: '#fff', dark: '#fff', belly: '#fff', eye:
 const E_WIND = 30, E_LUNGE = 14, E_REST = 36, E_DMG = 15;
 function spawnEnemies() {
   enemies = ENEMY_SPOTS.map(([tx, row]) => ({ x: tx * TS, y: row * TS - 14, w: 18, h: 14, vx: 0, vy: 0, face: -1, hp: 50, max: 50,
-    st: 'patrol', t: 0, cd: 40, flash: 0, barT: 0, alert: 0, anim: 0, ground: false, dead: false, bit: false }));
+    st: 'patrol', t: 0, lost: 0, cd: 40, flash: 0, barT: 0, alert: 0, anim: 0, ground: false, dead: false, bit: false }));
+}
+// tem chão em algum lugar abaixo da beirada? (se não, é um buraco sem fundo)
+function floorBelow(e, dir) {
+  const tx = Math.floor((e.x + (dir > 0 ? e.w + 1 : -1)) / TS);
+  for (let ty = Math.floor((e.y + e.h + 1) / TS); ty < MH; ty++) if (tile(tx, ty) !== AIR) return true;
+  return false;
 }
 // tem buraco logo à frente?
 const ledge = (e, dir) => tile(Math.floor((e.x + (dir > 0 ? e.w + 1 : -1)) / TS), Math.floor((e.y + e.h + 1) / TS)) === AIR;
@@ -876,23 +961,26 @@ function updateEnemy(e) {
   if (e.cd > 0) e.cd--;
   if (e.alert > 0) e.alert--;
   const dx = (pl.x + pl.w / 2) - (e.x + e.w / 2), dy = (pl.y + pl.h) - (e.y + e.h);
-  const sees = mode === 'play' && Math.abs(dx) < 120 && Math.abs(dy) < 34;
+  const sees = mode === 'play' && Math.abs(dx) < 150 && Math.abs(dy) < 48;
+  const hunting = mode === 'play' && Math.abs(dx) < 260 && Math.abs(dy) < 96;   // já perseguindo, só desiste bem mais longe
   let target = null;
   if (e.st === 'patrol') {
     target = e.face * .45;
     if (e.ground && ledge(e, e.face)) { e.face *= -1; target = 0; }
-    if (sees) { e.st = 'chase'; e.t = 0; e.face = Math.sign(dx) || e.face; e.vy = -1.8; e.alert = 30; sfx.alert(); }
+    if (sees) { e.st = 'chase'; e.t = 0; e.lost = 0; e.face = Math.sign(dx) || e.face; e.vy = -1.8; e.alert = 30; sfx.alert(); }
   } else if (e.st === 'chase') {
     if (Math.abs(dx) > 6) e.face = Math.sign(dx);
-    target = Math.abs(dx) > 14 ? e.face * 1.05 : 0;
-    if (e.ground && ledge(e, e.face)) target = 0;
-    if (!sees && e.t > 90) { e.st = 'patrol'; e.t = 0; }
+    target = Math.abs(dx) > 14 ? e.face * 1.25 : 0;
+    // na beirada: desce atrás do herói se lá embaixo tiver chão; só para diante de buraco sem fundo
+    if (e.ground && ledge(e, e.face) && !(dy > -8 && floorBelow(e, e.face))) target = 0;
+    e.lost = sees ? 0 : e.lost + 1;
+    if (!hunting || e.lost > 240) { e.st = 'patrol'; e.t = 0; }
     else if (Math.abs(dx) < 34 && Math.abs(dy) < 20 && e.cd <= 0 && e.ground) { e.st = 'wind'; e.t = 0; sfx.warn(); }
   } else if (e.st === 'wind') {
     target = 0;
     if (e.t >= E_WIND) { e.st = 'lunge'; e.t = 0; e.vx = e.face * 3.6; e.vy = -1.4; e.bit = false; sfx.bite(); }
   } else if (e.st === 'lunge') {
-    if (e.ground && ledge(e, e.face)) e.vx = 0;
+    if (e.ground && ledge(e, e.face) && !floorBelow(e, e.face)) e.vx = 0;
     if (e.ground && e.t > 3) e.vx *= .9;
     // rolando (ou ainda invencível) o bote passa direto: esquiva
     if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (pl.roll <= 0 && pl.inv <= 0) hurtPlayer(E_DMG, e.face); }
@@ -908,7 +996,7 @@ function updateEnemy(e) {
   e.vy = Math.min(MAXFALL, e.vy + GRAV);
   if (moveX(e, e.vx)) {
     if (e.st === 'patrol') e.face *= -1;
-    else if (e.st === 'chase' && e.ground) e.vy = -4.2;   // pula degraus baixos atrás do herói
+    else if (e.st === 'chase' && e.ground) e.vy = -5;   // pula paredes de até 4 blocos atrás do herói
   }
   e.ground = moveY(e, e.vy);
   if (e.ground) e.vy = 0;
@@ -941,7 +1029,7 @@ function resetLevel() {
   spawnEnemies();
   items = PEDESTALS.map(([tx, row, wid]) => ({ x: tx * TS + 4, y: row * TS, wid, ped: true }));
   setGate(true); GATE.lift = 0; GATE.open = false;
-  pl.weapon = null; nums = [];
+  pl.weapon = null; nums = []; arrows = [];
 }
 function nearItem() {
   let best = null, bd = 14;
@@ -985,7 +1073,7 @@ function update() {
   if (mode === 'title' && T % 8 === 0) drawPicks();
   if (mode === 'exit') updateExit();
   if (mode === 'dead' && ++deadT === 80) showDead();
-  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); }
+  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); }
   if (GATE.open && GATE.lift < 1) { GATE.lift = Math.min(1, GATE.lift + .02); if (T % 3 === 0) addP(GATE.tx * TS + rand(0, 8), GATE.y0 * TS, rand(-.2, .2), rand(.2, .6), 20, DUST, .05); }
   nums.forEach(n => { n.t++; n.y -= Math.max(0, 1.1 - n.t * .06); });
   nums = nums.filter(n => n.t < 45);
@@ -1064,6 +1152,7 @@ function draw() {
   drawPedestals(cx, cy);
   drawGate(cx, cy);
   enemies.forEach(e => drawBug(e, cx, cy));
+  arrows.forEach(ar => drawArrow(ar, cx, cy));
 
   // herói
   const hx = Math.round(pl.x + pl.w / 2 - cx), hy = Math.round(pl.y + pl.h - cy);
@@ -1078,11 +1167,19 @@ function draw() {
     if (pl.roll > 0) lc.rotate((1 - pl.roll / ROLL_T) * Math.PI * 2 * pl.face);
     if (pl.face < 0) lc.scale(-1, 1);
     lc.drawImage(img, -17, -17);
+    const ca = pl.atk;
+    if (ca && ca.heavy && ca.f < ca.s.wind && (T % 6 < 3 || ca.f > ca.s.wind - 8)) {
+      const ready = ca.f > ca.s.wind - 8;
+      lc.globalAlpha = ready ? .75 : .4;
+      lc.drawImage(spriteSil(heroIdx, pose, ready ? '#ffffff' : '#ffd23f'), -17, -17);
+      lc.globalAlpha = blink ? .35 : 1;
+    }
     lc.restore();
     if (pl.weapon && pl.roll <= 0) {
       const P = POSES[pose], px = hx + pl.face * (P.fh[0] + OX + 1 - 17 + .5), py = hy - 17 + P.fh[1] + P.bob + bob + 1 - 17 + .5;
-      drawWeapon(pl.weapon, px, py, weaponAngle(), pl.face);
-      drawSlash(px, py);
+      const a = pl.atk, pull = a && a.s.ranged && a.f < a.s.wind ? 1 + 3 * a.f / a.s.wind : 0;
+      drawWeapon(pl.weapon, px, py, weaponAngle(), pl.face, pull);
+      if (!(a && a.s.ranged)) drawSlash(px, py);
     }
     lc.globalAlpha = 1;
   }
@@ -1092,26 +1189,16 @@ function draw() {
     lc.fillStyle = c; lc.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), p.size, p.size);
   });
 
-  // escuridão com "buracos" de luz no herói, tochas e porta
-  dc.globalCompositeOperation = 'source-over';
-  dc.fillStyle = 'rgba(2,7,11,.5)'; dc.fillRect(0, 0, W, H);
-  dc.globalCompositeOperation = 'destination-out';
-  const hole = (x, y, r) => dc.drawImage(HOLE, x - r, y - r, r * 2, r * 2);
-  hole(pl.x + pl.w / 2 - cx, pl.y + pl.h / 2 - cy, 70);
-  const flick = Math.sin(T / 6) * 2;
-  TORCHES.forEach(([tx, ty]) => hole(tx * TS + 4 - cx, ty * TS - cy, 52 + flick));
-  hole(DOOR.x + 8 - cx, DOOR.y + 16 - cy, 60);
-  items.forEach(it => hole(it.x - cx, it.y - 16 - cy, 34));
-  lc.drawImage(dark, 0, 0);
+  // sem escuridão nem neblina: só um brilho leve na porta e nas armas
   lc.globalCompositeOperation = 'lighter';
-  TORCHES.forEach(([tx, ty]) => { const X = tx * TS + 4 - cx, Y = ty * TS - cy; if (X > -60 && X < W + 60 && Y > -60 && Y < H + 60) lc.drawImage(GLOW_G, X - 44 - flick, Y - 44 - flick, 88 + flick * 2, 88 + flick * 2); });
-  lc.globalAlpha = .6 + .4 * pulse; lc.drawImage(GLOW_O, DOOR.x + 8 - cx - 50, DOOR.y + 16 - cy - 50, 100, 100); lc.globalAlpha = 1;
-  items.forEach(it => lc.drawImage(GLOW_O, it.x - cx - 22, it.y - 16 - cy - 22, 44, 44));
-  lc.globalCompositeOperation = 'source-over';
-  // olhos dos bugs e números de dano por cima da escuridão
-  enemies.forEach(e => drawBug(e, cx, cy, true));
+  lc.globalAlpha = .3 + .2 * pulse; lc.drawImage(GLOW_O, DOOR.x + 8 - cx - 36, DOOR.y + 16 - cy - 36, 72, 72);
+  lc.globalAlpha = .5; items.forEach(it => lc.drawImage(GLOW_O, it.x - cx - 18, it.y - 16 - cy - 18, 36, 36));
+  lc.globalAlpha = 1; lc.globalCompositeOperation = 'source-over';
+  if (pl.weapon === 'arco' && mouseScr && mode === 'play') {
+    const mx = Math.round(mouseScr.x), my = Math.round(mouseScr.y), c = '#ffd23f';
+    R(mx - 4, my, 3, 1, c); R(mx + 2, my, 3, 1, c); R(mx, my - 4, 1, 3, c); R(mx, my + 2, 1, 3, c);
+  }
   nums.forEach(n => drawNum(n, cx, cy));
-  lc.drawImage(VIG, 0, 0);
   if (hurtFx) { lc.fillStyle = `rgba(255,40,70,${.28 * hurtFx})`; lc.fillRect(0, 0, W, H); }
   if (fade > 0) { lc.fillStyle = `rgba(0,0,0,${fade})`; lc.fillRect(0, 0, W, H); }
   else if (fade < 0) { lc.fillStyle = `rgba(255,246,216,${-fade})`; lc.fillRect(0, 0, W, H); }
@@ -1119,11 +1206,13 @@ function draw() {
   vc.imageSmoothingEnabled = false;
   vc.drawImage(low, 0, 0, view.width, view.height);
   updateTip();
+  const cur = mode === 'play' ? 'none' : '';
+  if (stageEl.style.cursor !== cur) stageEl.style.cursor = cur;
 }
 
 const R = (x, y, w, h, c) => { lc.fillStyle = c; lc.fillRect(x, y, w, h); };
 // arma desenhada pixel a pixel a partir da mão (x, y), girada pelo ângulo
-function drawWeapon(id, x, y, ang, face) {
+function drawWeapon(id, x, y, ang, face, pull = 0) {
   const a = ang * Math.PI / 180, dx = Math.cos(a) * face, dy = Math.sin(a), nx = -dy, ny = dx;
   const p = (t, s, c) => R(Math.round(x + dx * t + nx * s), Math.round(y + dy * t + ny * s), 1, 1, c);
   if (id === 'espada') {
@@ -1136,11 +1225,26 @@ function drawWeapon(id, x, y, ang, face) {
     for (let t = -2; t <= 11; t += .5) { p(t, 0, '#6b4226'); p(t, .8, '#4a2c18'); }
     for (let t = 10; t <= 15; t += .5) for (let s = -3.5; s <= 3.5; s += .5) p(t, s, t > 14 ? '#c3ccd4' : t < 11 ? '#4a5158' : '#7d8790');
     for (let s = -3.5; s <= 3.5; s += .5) p(15.5, s, '#e3e9ee');
+  } else if (id === 'arco') {
+    // arco curvado para frente, perpendicular à mira; corda puxada (pull) com a flecha encaixada
+    for (let s = -7; s <= 7; s += .5) { const t = 2.6 * (1 - (s / 7) * (s / 7)); p(t, s, '#8a5a2a'); p(t + .7, s, '#c08a4e'); }
+    p(0, -7, '#d9a640'); p(0, 7, '#d9a640');
+    for (let k = 0; k <= 1; k += .1) { p(-pull * k, -7 + 7 * k, '#e8e0d0'); p(-pull * k, 7 - 7 * k, '#e8e0d0'); }
+    if (pull > 0) { for (let t = -pull; t <= 9; t += .5) p(t, 0, '#c8a26b'); p(9.5, 0, '#e3e9ee'); p(10, 0, '#ffffff'); p(-pull, -1, '#ff6b3d'); p(-pull, 1, '#ff6b3d'); }
   }
+}
+function drawArrow(ar, cx, cy) {
+  const L = Math.hypot(ar.vx, ar.vy) || 1, ux = ar.vx / L, uy = ar.vy / L;
+  const x = ar.x - cx, y = ar.y - cy;
+  if (x < -12 || x > W + 12 || y < -12 || y > H + 12) return;
+  if (ar.stuck && ar.stuck < 15 && T % 2) return;
+  if (ar.heavy && !ar.stuck) for (let t = -10; t <= 1; t += .5) { R(Math.round(x + ux * t - uy), Math.round(y + uy * t + ux), 1, 1, '#ffd23f'); R(Math.round(x + ux * t + uy), Math.round(y + uy * t - ux), 1, 1, '#ffd23f'); }
+  for (let t = -9; t <= 0; t += .5) R(Math.round(x + ux * t), Math.round(y + uy * t), 1, 1, t > -1.5 ? '#ffffff' : t > -2.5 ? '#c3ccd4' : t < -7.5 ? '#ff6b3d' : '#c8a26b');
 }
 function weaponAngle() {
   const a = pl.atk;
   if (!a) return WEAPONS[pl.weapon].idle;
+  if (a.s.ranged) return a.aim;
   const s = a.s, f = a.f;
   if (f < s.wind) return s.arc[0] + (s.arc[0] < s.arc[1] ? -1 : 1) * 12 * (f / s.wind);
   if (f < s.wind + s.act) return s.arc[0] + (s.arc[1] - s.arc[0]) * ((f - s.wind + 1) / s.act);
@@ -1180,7 +1284,7 @@ function drawGate(cx, cy) {
   for (let y = top + 6; y < top + len - 3; y += 14) R(X, y, 8, 2, '#3a4248');
 }
 // bug: casco oval, cabeça na frente (e.face), patinhas animadas
-function drawBug(e, cx, cy, eyesOnly) {
+function drawBug(e, cx, cy) {
   const X = Math.round(e.x + e.w / 2 - cx), B = Math.round(e.y + e.h - cy), f = e.face;
   if (X < -30 || X > W + 30 || B < -30 || B > H + 40) return;
   const white = e.flash > 0, pal = white ? WHITE_PAL : BUG;
@@ -1188,7 +1292,6 @@ function drawBug(e, cx, cy, eyesOnly) {
   const lean = e.st === 'wind' ? (e.t > E_WIND - 10 ? -2 : -1) : e.st === 'lunge' ? 1 : 0;
   const hx = 8 + lean, hy = -6;
   const eyeC = e.st === 'wind' && T % 6 < 3 ? '#ffffff' : pal.eye;
-  if (eyesOnly) { if (!white) { px(hx, hy - 2, eyeC); px(hx + 2, hy - 2, eyeC); } return; }
   const walk = Math.floor(e.anim) % 2;
   for (let i = 0; i < 3; i++) {
     const lx = -7 + i * 6 + lean, ph = (walk + i) % 2;
@@ -1271,6 +1374,7 @@ const $ = id => document.getElementById(id);
 const fmt = f => { const s = Math.floor(f / 60); return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`; };
 function renderTimer() { $('timer').textContent = fmt(playT); }
 function banner(title, sub) {
+  $('hud').querySelectorAll('.banner').forEach(b => b.remove());   // um aviso de cada vez
   const d = document.createElement('div'); d.className = 'banner';
   d.innerHTML = `${title}<small>${sub}</small>`;
   $('hud').appendChild(d); d.addEventListener('animationend', () => d.remove());
@@ -1288,6 +1392,7 @@ function updateTip() {
     if (it) {
       const w = WEAPONS[it.wid];
       $('tipName').textContent = w.name; $('tipDesc').textContent = w.desc;
+      $('tipHeavy').innerHTML = `Botão direito: <b>${w.heavyName}</b>, ${w.heavyDesc}`;
       $('tipStats').innerHTML = w.stats.map(([k, v]) => `<span>${k}</span><i>${'■'.repeat(v)}${'□'.repeat(3 - v)}</i>`).join('');
     }
   }
@@ -1374,12 +1479,29 @@ addEventListener('keydown', e => {
   if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', ' '].includes(k)) e.preventDefault();
   if (e.repeat) return;
   keys.add(k);
-  if (k === ' ' || k === 'w' || k === 'arrowup' || k === 'k') pl.buf = BUFFER;
+  if (k === ' ' || k === 'w' || k === 'arrowup') pl.buf = BUFFER;
+  if (k === 'd' || k === 'arrowright') lastDir = 1;
+  if (k === 'a' || k === 'arrowleft') lastDir = -1;
   if (k === 'shift' || k === 'l') roll();
-  if (k === 'j') pl.atkBuf = 10;
+  if (k === 'j') { pl.atkBuf = 10; aimPt = null; }
+  if (k === 'k') { pl.heavyBuf = 12; aimPt = null; }
   if (k === 'e') pickItem();
 });
-$('stage').addEventListener('pointerdown', e => { if (e.button === 0 && mode === 'play') { pl.atkBuf = 10; e.preventDefault(); } });
+// posição do mouse convertida para coordenadas do mapa
+function toScreen(e) {
+  const r = view.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+}
+$('stage').addEventListener('pointerdown', e => {
+  if ((e.button !== 0 && e.button !== 2) || mode !== 'play') return;
+  mouseScr = toScreen(e); aimPt = { x: cam.x + mouseScr.x, y: cam.y + mouseScr.y };
+  if (e.button === 2) pl.heavyBuf = 12; else pl.atkBuf = 10;
+  e.preventDefault();
+});
+// o menu do botão direito "roubava" o soltar das teclas e o herói ficava andando sozinho
+addEventListener('contextmenu', e => { if (mode === 'play' || e.target.closest('.stage')) e.preventDefault(); });
+$('stage').addEventListener('pointermove', e => { mouseScr = toScreen(e); });
+$('stage').addEventListener('pointerleave', () => { mouseScr = null; });
 addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
 addEventListener('blur', () => keys.clear());
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
