@@ -41,7 +41,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .pot.flash{animation:potFlash .4s steps(4)}
 @keyframes potFlash{50%{color:#fff;transform:translateX(3px)}}
 .php i{position:absolute;inset:0;background:#4ade80;transform-origin:left;transition:transform .2s steps(5)}
-.tip{position:absolute;transform:translate(-50%,-100%);background:rgba(5,12,16,.93);border:2px solid var(--orange);box-shadow:0 0 0 2px #000;padding:6px 10px 7px;font-family:var(--mono);font-size:clamp(9px,1.1vw,13px);line-height:1.35;width:max-content;max-width:min(46%,320px);display:flex;flex-direction:column;gap:3px;text-align:left}
+.tip{position:absolute;background:rgba(5,12,16,.93);border:2px solid var(--orange);box-shadow:0 0 0 2px #000;padding:6px 10px 7px;font-family:var(--mono);font-size:clamp(9px,1.1vw,13px);line-height:1.35;width:max-content;max-width:min(46%,320px);display:flex;flex-direction:column;gap:3px;text-align:left}
 .tip[hidden]{display:none}
 .tip b{font-family:var(--display);font-size:1.35em;color:#ffd23f}
 .tip span{color:var(--dim)}
@@ -52,6 +52,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .tip span.theavy b{font-family:var(--mono);font-size:1em;color:#ffd23f}
 .plate b{color:var(--c)}
 .plate small{color:var(--dim);font-family:var(--mono);font-size:.72em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coins{position:absolute;right:2%;top:calc(4% + 1.6em);font-size:clamp(11px,1.7vw,17px);color:#ffd23f;font-variant-numeric:tabular-nums;text-shadow:2px 2px 0 #000;display:flex;align-items:center;gap:6px}
+.coins b{display:inline-block;width:.75em;height:.75em;background:#ffd23f;border:2px solid #7a5a1c;border-radius:50%;box-shadow:0 0 0 1px #000}
+.coins.pop{animation:coinPop .25s steps(3)}
+@keyframes coinPop{50%{transform:scale(1.25)}}
 .timer{position:absolute;right:2%;top:4%;font-size:clamp(11px,1.7vw,17px);color:var(--dim);font-variant-numeric:tabular-nums;text-shadow:2px 2px 0 #000}
 .banner{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);text-align:center;font-size:clamp(20px,4.6vw,44px);font-weight:700;color:var(--teal);text-shadow:3px 3px 0 #000;white-space:nowrap;animation:pop 3.2s steps(32) forwards}
 .banner small{display:block;font-size:.4em;color:var(--ink);margin-top:6px}
@@ -102,13 +106,14 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
         <div class="php"><i id="hpFill"></i></div>
         <div class="pot" id="pot"></div>
       </div>
-      <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><span class="theavy" id="tipHeavy"></span><em><kbd>E</kbd> pegar</em></div>
+      <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><span class="theavy" id="tipHeavy"></span><span class="theavy" id="tipNote"></span><em><kbd>E</kbd> <span id="tipAct">pegar</span></em></div>
       <div class="timer" id="timer">0m 00s</div>
+      <div class="coins" id="coins"><b></b><span id="coinN">0</span></div>
       <div class="overlay" id="titleScreen">
         <h2>Escolha seu <span>herói</span></h2>
         <div class="picks" id="picks"></div>
         <button id="startBtn">Jogar</button>
-        <p class="dim pickHint"><kbd>←</kbd><kbd>→</kbd> ou <kbd>1</kbd>–<kbd>5</kbd> escolhem · <kbd>Enter</kbd> começa<br><kbd>A</kbd><kbd>D</kbd> andar · <kbd>Espaço</kbd>/<kbd>W</kbd> pular (2x no ar) · <kbd>J</kbd>/clique atacar (no arco, o clique mira) · <kbd>K</kbd>/botão direito ataque carregado · <kbd>Shift</kbd> rolar (desvia de ataques) · <kbd>E</kbd> pegar arma · <kbd>Q</kbd> beber poção de cura · <kbd>S</kbd>+<kbd>Espaço</kbd> descer da madeira · <kbd>F</kbd> tela cheia · <kbd>Esc</kbd> pausa</p>
+        <p class="dim pickHint"><kbd>←</kbd><kbd>→</kbd> ou <kbd>1</kbd>–<kbd>5</kbd> escolhem · <kbd>Enter</kbd> começa<br><kbd>A</kbd><kbd>D</kbd> andar · <kbd>Espaço</kbd>/<kbd>W</kbd> pular (2x no ar) · <kbd>J</kbd>/clique atacar (no arco, o clique mira) · <kbd>K</kbd>/botão direito ataque carregado · <kbd>Shift</kbd> rolar (desvia de ataques) · <kbd>E</kbd> pegar / abrir baú · <kbd>Q</kbd> beber poção de cura · <kbd>S</kbd>+<kbd>Espaço</kbd> descer da madeira · <kbd>F</kbd> tela cheia · <kbd>Esc</kbd> pausa</p>
       </div>
       <div class="overlay" id="pauseScreen" hidden>
         <h2>Pausado</h2>
@@ -117,13 +122,13 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
       </div>
       <div class="overlay" id="deadScreen" hidden>
         <h2>Você <span>caiu</span></h2>
-        <p class="dim">Os bugs venceram desta vez.</p>
+        <p class="dim">Os bugs venceram desta vez. Moedas perdidas: <b id="deadCoins">0</b></p>
         <div class="row"><button id="retryBtn">Tentar de novo</button><button class="ghost" id="deadHeroBtn">Trocar herói</button></div>
       </div>
       <div class="overlay" id="winScreen" hidden>
         <h2>Saída <span>encontrada!</span></h2>
-        <p class="stats">Tempo: <b id="winTime">0s</b> · Recorde: <b id="winBest">0s</b></p>
-        <p class="dim">Você atravessou a masmorra! Nas próximas etapas: moedas, baús, armas melhores e frascos de cura.</p>
+        <p class="stats">Tempo: <b id="winTime">0s</b> · Recorde: <b id="winBest">0s</b> · Moedas: <b id="winCoins">0</b></p>
+        <p class="dim">Você atravessou a masmorra! Em breve: lojinha e sala de melhorias para gastar as moedas.</p>
         <div class="row"><button id="againBtn">Jogar de novo</button><button class="ghost" id="winHeroBtn">Trocar herói</button></div>
       </div>
     </div>
@@ -462,6 +467,26 @@ const WEAPONS = {
       { wind: 18, act: 7, rec: 22, dmg: 31, reach: 28, up: 14, kb: 5.5, step: 2.2, stop: 7, shake: 5, arc: [-160, 75], pw: 'windup', pa: 'attack', pr: 'slam', slam: true },
     ],
   },
+  lanca: {
+    name: 'Lança de Guerra', desc: 'Estocadas longas que atravessam a fila de bugs.', tint: '#ffd9a0', idle: -70, run: -120,
+    note: 'Crítico: acertar 2 ou mais bugs no mesmo golpe causa dano dobrado.',
+    stats: [['Dano', 2], ['Velocidade', 2], ['Alcance', 3]],
+    heavyName: 'Investida', heavyDesc: 'dispara para frente espetando tudo no caminho.',
+    heavy: { wind: 30, act: 8, rec: 24, dmg: 30, reach: 46, up: 0, kb: 5, step: 5.5, stop: 8, shake: 5, arc: [-4, 0], thrust: true, crit: true, pw: 'draw', pa: 'attack', pr: 'attack' },
+    combo: [
+      { wind: 9, act: 4, rec: 14, dmg: 13, reach: 38, up: 0, kb: 2, step: 1.4, stop: 3, shake: 1, arc: [-4, 0], thrust: true, crit: true, pw: 'draw', pa: 'attack', pr: 'attack' },
+      { wind: 9, act: 4, rec: 18, dmg: 17, reach: 40, up: 0, kb: 3, step: 2, stop: 4, shake: 2, arc: [-4, 0], thrust: true, crit: true, pw: 'draw', pa: 'attack', pr: 'attack' },
+    ],
+  },
+  besta: {
+    name: 'Besta Explosiva', desc: 'Virotes explodem ao acertar um bug e soltam estilhaços em volta. Clique para mirar.', tint: '#ffb27a', idle: 30, run: 120,
+    stats: [['Dano', 3], ['Velocidade', 1], ['Alcance', 3]],
+    heavyName: 'Virote Pesado', heavyDesc: 'explosão bem maior, com o dobro de estilhaços.',
+    heavy: { ranged: true, bolt: true, wind: 46, act: 1, rec: 22, dmg: 26, kb: 3, stop: 6, shake: 3, speed: 8, explode: { r: 36, dmg: 16, frags: 12 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    combo: [
+      { ranged: true, bolt: true, wind: 18, act: 1, rec: 18, dmg: 16, kb: 2, stop: 3, shake: 1, speed: 7, explode: { r: 24, dmg: 9, frags: 6 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    ],
+  },
   arco: {
     name: 'Arco Simples', desc: 'Ataca de longe. Clique para mirar com o mouse; J atira para frente.', tint: '#e6d2a0', idle: 70, run: 115,
     heavyName: 'Flecha Perfurante', heavyDesc: 'atravessa todos os bugs no caminho.',
@@ -526,7 +551,7 @@ function spriteSil(ci, pose, col = '#fff6d8') {
 }
 
 // ---------- mapa (tudo começa sólido e as salas são "escavadas")
-const MW = 422, MH = 40;
+const MW = 470, MH = 40;
 const AIR = 0, SOLID = 1, PLAT = 2;
 const map = Array.from({ length: MH }, () => new Uint8Array(MW).fill(SOLID));
 function fillT(x0, y0, x1, y1, v) {
@@ -575,24 +600,45 @@ plat(304, 22, 5); plat(311, 18, 5); plat(304, 14, 5); plat(311, 10, 6); plat(318
 carve(331, 2, 359, 7);
 // salão da emboscada final
 carve(360, 2, 400, 17);
-// corredor da saída
+// corredor depois da emboscada final
 carve(401, 12, 419, 17);
+// ponte quebrada: fosso largo com tábuas
+carve(420, 6, 452, 17);
+carve(426, 18, 446, MH - 1);
+plat(430, 15, 3); plat(436, 13, 3); plat(442, 15, 3);
+// sala da saída
+carve(453, 10, 466, 17);
+// salas secretas (escondidas atrás de paredes falsas, ver SECRETS)
+carve(112, 26, 129, 33); carve(130, 30, 130, 33);
+carve(286, 4, 299, 9); carve(300, 6, 300, 9); plat(301, 10, 3);
 
 const START = { x: 6 * TS, y: 30 * TS };
-const DOOR = { x: 416 * TS, y: 14 * TS, w: 16, h: 32 };
+const DOOR = { x: 462 * TS, y: 14 * TS, w: 16, h: 32 };
+// salas secretas: a passagem é uma parede falsa (dá para atravessar) e a sala só aparece quando o herói entra
+// wall: [coluna, linha inicial, linha final] da parede falsa; dir: para que lado sai o "ventinho" de dica
+const SECRETS = [
+  { x0: 112, y0: 26, x1: 130, y1: 33, wall: [130, 30, 33], dir: 1 },
+  { x0: 286, y0: 4, x1: 300, y1: 9, wall: [300, 6, 9], dir: 1 },
+];
+const inSecret = (x, y) => SECRETS.some(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
+// baús: escolha entre a arma nova e uma poção
+const CHESTS = [{ tx: 116, row: 34, wid: 'lanca' }, { tx: 291, row: 10, wid: 'besta' }];
 const TORCHES = [[8, 25], [28, 25], [40, 25], [58, 25], [66, 24], [101, 24], [70, 11], [99, 9], [112, 10], [124, 10], [145, 29], [160, 24], [176, 29], [186, 24], [199, 17], [212, 16], [226, 16], [233, 16],
-  [248, 18], [256, 18], [266, 16], [280, 15], [296, 16], [303, 20], [326, 14], [318, 4], [340, 4], [354, 4], [368, 8], [380, 8], [392, 8], [406, 14], [413, 14]];
-const WINDOWS = [[33, 18], [67, 15], [96, 23], [152, 22], [171, 22], [216, 9], [228, 9], [276, 14], [292, 14], [322, 12], [372, 6], [388, 6]];
-const BARRELS = [[36, 29], [37, 29], [60, 29], [99, 29], [173, 33], [174, 33], [231, 21], [296, 25], [297, 25], [358, 7], [398, 17]];
-const CHAINS = [[20, 14, 5], [80, 6, 12], [118, 8, 3], [161, 20, 5], [190, 10, 8], [220, 6, 6], [279, 12, 6], [309, 2, 8], [376, 2, 5], [395, 2, 4]];
+  [248, 18], [256, 18], [266, 16], [280, 15], [296, 16], [303, 20], [326, 14], [318, 4], [340, 4], [354, 4], [368, 8], [380, 8], [392, 8], [406, 14], [413, 14], [424, 12], [449, 12], [456, 13], [465, 13]];
+const WINDOWS = [[33, 18], [67, 15], [96, 23], [152, 22], [171, 22], [216, 9], [228, 9], [276, 14], [292, 14], [322, 12], [372, 6], [388, 6], [428, 7]];
+const BARRELS = [[36, 29], [37, 29], [60, 29], [99, 29], [173, 33], [174, 33], [231, 21], [296, 25], [297, 25], [358, 7], [398, 17], [114, 33], [128, 33], [297, 9], [454, 17]];
+const CHAINS = [[20, 14, 5], [80, 6, 12], [118, 8, 3], [161, 20, 5], [190, 10, 8], [220, 6, 6], [279, 12, 6], [309, 2, 8], [376, 2, 5], [395, 2, 4], [433, 6, 4], [440, 6, 3], [121, 26, 3], [293, 4, 2]];
 
 // ---------- desenho do mapa (pré-renderizado uma vez)
 const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = MH * TS;
-(function buildLevel() {
-  const b = lvl.getContext('2d');
+const lvlS = document.createElement('canvas'); lvlS.width = MW * TS; lvlS.height = MH * TS;
+// view(x, y): que bloco desenhar; hide: esconde a decoração que fica dentro das salas secretas
+function buildLevel(cv, view, hide) {
+  const b = cv.getContext('2d');
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
-  const open = (x, y) => x >= 0 && y >= 0 && x < MW && y < MH && map[y][x] !== SOLID;
+  const open = (x, y) => x >= 0 && y >= 0 && x < MW && y < MH && view(x, y) !== SOLID;
+  const shown = (x, y) => !hide || !inSecret(x, y);
   const depth = (x, y) => {
     for (let d = 1; d <= 3; d++) for (let dy = -d; dy <= d; dy++) for (let dx = -d; dx <= d; dx++) if (open(x + dx, y + dy)) return d;
     return 4;
@@ -602,7 +648,7 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
     const o = (ty % 2) * 4; r(X + o, Y + 1, 1, 3, mortar); r(X + (o + 4) % 8, Y + 5, 1, 3, mortar);
   };
   for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
-    const t = map[y][x], X = x * TS, Y = y * TS;
+    const t = view(x, y), X = x * TS, Y = y * TS;
     if (t !== SOLID) {
       const patch = ((x >> 2) * 7 + (y >> 2) * 13) % 5 === 0;
       bricks(X, Y, y, patch ? '#0c1c23' : '#0e2129', '#09171d');
@@ -610,8 +656,8 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
       if (t === PLAT) {
         r(X, Y, TS, 1, '#c28a52'); r(X, Y + 1, TS, 2, '#80552f'); r(X, Y + 3, TS, 1, '#4a2f1c');
         if (x % 2 === 0) r(X + 1, Y + 1, 1, 1, '#2b1a10');
-        if (map[y][x - 1] !== PLAT) { r(X + 1, Y + 4, 2, 1, '#3a2618'); r(X + 2, Y + 5, 2, 1, '#3a2618'); r(X + 3, Y + 6, 2, 1, '#3a2618'); }
-        if (map[y][x + 1] !== PLAT) { r(X + 5, Y + 4, 2, 1, '#3a2618'); r(X + 4, Y + 5, 2, 1, '#3a2618'); r(X + 3, Y + 6, 2, 1, '#3a2618'); }
+        if (view(x - 1, y) !== PLAT) { r(X + 1, Y + 4, 2, 1, '#3a2618'); r(X + 2, Y + 5, 2, 1, '#3a2618'); r(X + 3, Y + 6, 2, 1, '#3a2618'); }
+        if (view(x + 1, y) !== PLAT) { r(X + 5, Y + 4, 2, 1, '#3a2618'); r(X + 4, Y + 5, 2, 1, '#3a2618'); r(X + 3, Y + 6, 2, 1, '#3a2618'); }
       }
       continue;
     }
@@ -642,6 +688,7 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
   });
   // correntes penduradas no teto
   CHAINS.forEach(([cx, cy, n]) => {
+    if (!shown(cx, cy)) return;
     const X = cx * TS + 4;
     for (let y = 0; y < n * TS; y += 4) {
       if ((y >> 2) % 2) { r(X, cy * TS + y, 1, 4, '#7f8a90'); }
@@ -652,6 +699,7 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
   TORCHES.forEach(([tx, ty]) => { const X = tx * TS, Y = ty * TS; r(X + 3, Y + 4, 2, 6, '#3a3530'); r(X + 2, Y + 3, 4, 2, '#6b5a48'); r(X + 2, Y + 9, 4, 1, '#3a3530'); });
   // barris
   BARRELS.forEach(([bx, by]) => {
+    if (!shown(bx, by)) return;
     const X = bx * TS, Y = (by + 1) * TS - 10;
     r(X + 1, Y, 6, 10, '#6a4428'); r(X, Y + 2, 8, 6, '#6a4428');
     r(X + 2, Y + 1, 1, 8, '#8c5e38'); r(X + 6, Y + 1, 1, 8, '#4a2e1a');
@@ -662,7 +710,9 @@ const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = 
   r(DX - 3, DY - 4, 22, 36, '#2c6470'); r(DX - 2, DY - 3, 20, 35, '#1a404c');
   r(DX, DY, 16, 32, '#03070a'); r(DX - 4, DY + 30, 24, 2, '#4aa383');
   r(DX + 7, DY - 3, 2, 2, '#f5801e');
-})();
+}
+buildLevel(lvl, (x, y) => inSecret(x, y) ? SOLID : map[y][x], true);
+buildLevel(lvlS, (x, y) => map[y][x], false);
 
 // ---------- portões: o 0 é o da sala inicial (abre ao pegar a arma); os outros trancam as salas de emboscada
 // (a colisão é ligada à parte; no desenho pré-renderizado as passagens aparecem abertas)
@@ -684,6 +734,8 @@ const ENCOUNTERS = [
   { at: 262, list: [['flyer', 272, 18], ['flyer', 287, 17]] },
   { at: 292, list: [['bug', 299, 26], ['shooter', 313, 18], ['flyer', 308, 8]] },
   { at: 333, list: [['shield', 345, 8], ['bug', 353, 8]] },
+  { at: 422, list: [['flyer', 433, 9], ['flyer', 441, 8]] },
+  { at: 448, list: [['bug', 456, 18], ['shooter', 461, 18]] },
 ];
 // salas de emboscada: ao entrar, os portões fecham e vêm ondas de inimigos
 const AMBUSHES = [
@@ -755,6 +807,12 @@ const sfx = {
   big() { noise(.45, .22, 900); tone(80, .45, 'triangle', .12, -40); },
   twang() { tone(620, .09, 'triangle', .05, -380); noise(.06, .05, 6000); },
   thunk() { noise(.06, .08, 1200); tone(240, .05, 'square', .025, -100); },
+  coin(i = 0) { tone(1320 + (i % 4) * 110, .05, 'square', .025); tone(1760 + (i % 4) * 110, .07, 'square', .02, 0, .04); },
+  chest() { noise(.2, .08, 800); [392, 523, 659, 784].forEach((f, i) => tone(f, .12, 'triangle', .045, 0, .1 + i * .07)); },
+  secret() { [659, 784, 988, 1318].forEach((f, i) => tone(f, .16, 'triangle', .045, 0, i * .09)); },
+  boom(k = 1) { noise(.35 * k + .1, .2 * k, 1400); tone(110, .25, 'triangle', .1 * k, -60); },
+  crit() { tone(1600, .06, 'square', .05); tone(2200, .1, 'square', .04, 0, .05); noise(.08, .1, 6000); },
+  crank() { tone(240, .05, 'square', .03); tone(200, .05, 'square', .03, 0, .07); },
   spawn() { tone(200, .15, 'square', .03, 600); noise(.1, .05, 3000); },
   clink() { tone(1500, .05, 'square', .05); tone(1100, .08, 'triangle', .04, 0, .03); },
   glitch() { tone(1800, .04, 'square', .03); tone(600, .04, 'square', .03, 0, .04); tone(1200, .04, 'square', .03, 0, .08); },
@@ -786,7 +844,8 @@ const COYOTE = 6, BUFFER = 7, ROLL_T = 20, ROLL_SPD = 3.4, ROLL_CD = 28;
 const pl = { x: 0, y: 0, w: 10, h: 28, vx: 0, vy: 0, face: 1, ground: false, coyote: 0, buf: 0, jumps: 0, cut: false, roll: 0, rollCd: 0, drop: 0, anim: 0, land: 0, safe: null,
   hp: 100, max: 100, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
 let heroIdx = 0, T = 0, mode = 'title', playT = 0, fade = 0, exitT = 0, deadT = 0, hitstop = 0, shake = 0, hurtFx = 0;
-let enemies = [], items = [], nums = [], arrows = [];
+let enemies = [], items = [], nums = [], arrows = [], coins = [], frags = [], blasts = [], chests = [];
+let coinCount = 0;
 let aimPt = null, mouseScr = null;   // aimPt: ponto do mapa clicado para atacar; mouseScr: mouse na tela (para desenhar a mira)
 // teletransporte na porta: brilha, estica num raio de luz e some
 const EXIT_GLOW = 24, EXIT_GONE = 40, EXIT_END = 75;
@@ -959,7 +1018,7 @@ function shootArrow(a) {
   const s = a.s, r = a.aim * Math.PI / 180, ox = pl.x + pl.w / 2 + pl.face * 6, oy = pl.y + 12;
   arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * s.speed, vy: Math.sin(r) * s.speed, s, life: 90, stuck: 0, hit: new Set(), heavy: a.heavy });
   if (a.heavy) { sfx.big(); burst(ox, oy, 10, ['#ffffff', '#ffd23f'], 1.6); shake = Math.max(shake, 2); }
-  sfx.twang();
+  if (s.bolt) sfx.crank(); else sfx.twang();
 }
 function updateArrows() {
   arrows.forEach(ar => {
@@ -977,6 +1036,7 @@ function updateArrows() {
       if (e) {
         ar.hit.add(e);
         const ok = hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1, ar.heavy);
+        if (ar.s.explode) explodeAt(ar.x, ar.y, ar.s.explode, e);   // explode mesmo se bateu no escudo
         if (!ok || !ar.s.pierce) { ar.life = 0; ar.gone = true; return; }   // bateu no escudo, ou flecha comum: some; a perfurante segue
       }
     }
@@ -985,6 +1045,36 @@ function updateArrows() {
   });
   arrows = arrows.filter(ar => !ar.gone && (ar.life > 0 || ar.stuck > 0) && ar.y < MH * TS + 20);
 }
+// explosão: dano em área + estilhaços para todos os lados (o bug atingido direto não leva de novo)
+const FRAG_S = { dmg: 5, kb: .8, stop: 1, shake: 0, ranged: true };
+function explodeAt(x, y, ex, skip) {
+  blasts.push({ x, y, r: ex.r, t: 0, max: 18 });
+  burst(x, y, 18, ['#fff6c2', '#ffd23f', '#ff8c1a', '#e8431f'], 2.4, .04, [10, 22]);
+  burst(x, y, 10, SMOKE, 1.2, -.02, [16, 28], 2);
+  sfx.boom(ex.r > 30 ? 1.3 : .8); shake = Math.max(shake, ex.r > 30 ? 6 : 4);
+  const blastS = { dmg: ex.dmg, kb: 2.5, stop: 2, shake: 0, ranged: true };
+  enemies.forEach(e => {
+    if (e === skip || !targetable(e)) return;
+    const cx = e.x + e.w / 2, cy = e.y + e.h / 2;
+    if (Math.hypot(cx - x, cy - y) <= ex.r + e.w / 2) hitEnemy(e, blastS, Math.sign(cx - x) || 1);
+  });
+  for (let i = 0; i < ex.frags; i++) {
+    const an = i / ex.frags * Math.PI * 2 + rand(-.2, .2), sp = rand(2.8, 3.6);
+    frags.push({ x, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: irand(14, 20), skip });
+  }
+}
+function updateFrags() {
+  frags.forEach(f => {
+    f.x += f.vx; f.y += f.vy; f.vy += .08; f.life--;
+    if (tile(Math.floor(f.x / TS), Math.floor(f.y / TS)) === SOLID) { f.life = 0; return; }
+    const e = enemies.find(o => o !== f.skip && targetable(o) && f.x > o.x - 1 && f.x < o.x + o.w + 1 && f.y > o.y - 4 && f.y < o.y + o.h + 1);
+    if (e) { hitEnemy(e, FRAG_S, Math.sign(f.vx) || 1); f.life = 0; }
+  });
+  frags = frags.filter(f => f.life > 0);
+  blasts.forEach(b => b.t++);
+  blasts = blasts.filter(b => b.t < b.max);
+}
+
 function updateAttack() {
   if (!pl.weapon || pl.roll > 0 || pl.hurt > 0 || pl.drink > 0) return;
   const a = pl.atk;
@@ -1022,9 +1112,13 @@ function atkBox(s) {
 function hitCheck(a) {
   const box = atkBox(a.s);
   const px = pl.x + pl.w / 2;
-  enemies.forEach(e => { if (targetable(e) && !a.hit.has(e) && overlap(box, e)) { a.hit.add(e); hitEnemy(e, a.s, Math.sign(e.x + e.w / 2 - px) || pl.face, a.heavy); } });
+  const targets = enemies.filter(e => targetable(e) && !a.hit.has(e) && overlap(box, e));
+  // Lança de Guerra: 2 ou mais bugs no mesmo golpe = crítico (dano dobrado)
+  const crit = a.s.crit && targets.length + a.hit.size >= 2;
+  if (crit && targets.length && !a.critFx) { a.critFx = true; sfx.crit(); shake = Math.max(shake, 4); }
+  targets.forEach(e => { a.hit.add(e); hitEnemy(e, a.s, Math.sign(e.x + e.w / 2 - px) || pl.face, a.heavy, crit); });
 }
-function addNum(v, x, y, col) { nums.push({ s: String(v), x: x + rand(-3, 3), y, col, t: 0 }); }
+function addNum(v, x, y, col, big) { nums.push({ s: String(v), x: x + rand(-3, 3), y, col, t: 0, big }); }
 
 // ---------- poção de cura
 const DRINK_T = 40, HEAL = .5;
@@ -1067,11 +1161,11 @@ const PALS = {
   shooter: { shell: '#c9413b', hi: '#f59a7a', dark: '#360d0d', belly: '#852a26', eye: '#fff176' },
 };
 const ETYPES = {
-  bug: { name: 'Bug de Produção', hp: 50, w: 18, h: 14, dmg: 15, speed: 1.25, wind: 30 },
-  shield: { name: 'Link Quebrado', hp: 70, w: 18, h: 14, dmg: 18, speed: .85, wind: 24, tip: 'o escudo bloqueia tudo de frente: role por cima e ataque pelas costas' },
-  ghost: { name: 'Erro 404', hp: 45, w: 18, h: 14, dmg: 15, speed: 1.1, wind: 26, tip: 'some e reaparece atrás de você' },
-  flyer: { name: 'Prazo Estourado', hp: 30, w: 14, h: 10, dmg: 12, fly: true, wind: 26, tip: 'mergulha do alto: role para desviar' },
-  shooter: { name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32, tip: 'atira de longe: role ou pule os disparos' },
+  bug: { coins: [3, 5], name: 'Bug de Produção', hp: 50, w: 18, h: 14, dmg: 15, speed: 1.25, wind: 30 },
+  shield: { coins: [6, 8], name: 'Link Quebrado', hp: 70, w: 18, h: 14, dmg: 18, speed: .85, wind: 24, tip: 'o escudo bloqueia tudo de frente: role por cima e ataque pelas costas' },
+  ghost: { coins: [5, 7], name: 'Erro 404', hp: 45, w: 18, h: 14, dmg: 15, speed: 1.1, wind: 26, tip: 'some e reaparece atrás de você' },
+  flyer: { coins: [3, 4], name: 'Prazo Estourado', hp: 30, w: 14, h: 10, dmg: 12, fly: true, wind: 26, tip: 'mergulha do alto: role para desviar' },
+  shooter: { coins: [4, 6], name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32, tip: 'atira de longe: role ou pule os disparos' },
 };
 const WHITE_PAL = { shell: '#fff', hi: '#fff', dark: '#fff', belly: '#fff', eye: '#fff' };
 const E_LUNGE = 14, E_REST = 36, SPAWN_T = 36;
@@ -1258,7 +1352,7 @@ function updateFlyer(e) {
   if ((hitX || hitY) && e.st === 'dive') { e.st = 'rest'; e.t = 0; dust(cx, e.y + e.h, 4); }
 }
 
-function hitEnemy(e, s, dir, heavy) {
+function hitEnemy(e, s, dir, heavy, crit) {
   // Link Quebrado: qualquer golpe de frente bate no escudo, até o carregado; só leva dano pelas costas
   // (uma arma futura com breaksShield vai poder furar a guarda)
   if (e.type === 'shield' && dir === -e.face && !(s.breaksShield || (pl.weapon && WEAPONS[pl.weapon].breaksShield))) {
@@ -1268,11 +1362,12 @@ function hitEnemy(e, s, dir, heavy) {
     if (!s.ranged) pl.vx = -dir * 1.8;
     return false;
   }
-  const dmg = Math.round(s.dmg * rand(.9, 1.1));
+  const dmg = Math.round(s.dmg * rand(.9, 1.1) * (crit ? 2 : 1));
   e.hp -= dmg; e.flash = 7; e.barT = 160;
   if (e.type !== 'shield') e.face = -dir;
   const ex = e.x + e.w / 2, ey = e.y + e.h / 2;
-  addNum(dmg, ex, e.y - 6, s.dmg >= 18 ? '#ffd23f' : '#ffffff');
+  if (crit) { addNum(dmg + '!', ex, e.y - 10, '#ff8c1a', true); burst(ex, ey, 12, ['#ffffff', '#ffd23f', '#ff8c1a'], 2.6, 0, [8, 16]); }
+  else addNum(dmg, ex, e.y - 6, s.dmg >= 18 ? '#ffd23f' : '#ffffff');
   burst(ex - dir * 4, ey, 8, ['#ffffff', '#ffd23f', e.pal.hi], 2, .05, [6, 14]);
   burst(ex, ey, 5, [e.pal.shell, e.pal.dark], 1.4, .15, [12, 22]);
   hitstop = Math.max(hitstop, s.stop); shake = Math.max(shake, s.shake); sfx.hit(s.dmg >= 18 ? 1.4 : 1);
@@ -1290,6 +1385,27 @@ function killEnemy(e) {
   burst(ex, ey, 26, [e.pal.hi, e.pal.shell, e.pal.belly, e.pal.dark], 2.2, .12, [16, 30], 2);
   burst(ex, ey, 14, SMOKE, 1.2, -.01, [14, 26], 2);
   sfx.kill(); shake = Math.max(shake, 3); hitstop = Math.max(hitstop, 6);
+  const [a, b] = ETYPES[e.type].coins;
+  for (let i = irand(a, b); i > 0; i--) coins.push({ x: ex, y: ey, w: 3, h: 3, vx: rand(-1.6, 1.6), vy: rand(-3.2, -1.6), t: 0, ground: false });
+}
+function updateCoins() {
+  const px = pl.x + pl.w / 2, py = pl.y + pl.h / 2;
+  coins.forEach(c => {
+    c.t++;
+    const dx = px - c.x, dy = py - c.y, d = Math.hypot(dx, dy);
+    if (mode === 'play' && c.t > 20 && d < 40) {
+      // ímã: voa até o herói
+      c.x += dx / d * Math.min(d, 2 + c.t * .05); c.y += dy / d * Math.min(d, 2 + c.t * .05);
+      if (d < 7) { c.got = true; coinCount++; sfx.coin(coinCount); renderCoins(); addP(c.x, c.y, 0, -.6, 10, ['#fff6c2', '#ffd23f']); }
+      return;
+    }
+    c.vy = Math.min(MAXFALL, c.vy + .25);
+    moveX(c, c.vx);
+    const vy = c.vy;
+    if (moveY(c, c.vy)) { c.vy = vy > 1 ? -vy * .45 : 0; c.vx *= .8; }
+    if (c.y > MH * TS + 10) c.got = true;
+  });
+  coins = coins.filter(c => !c.got);
 }
 
 // encontros e emboscadas
@@ -1313,33 +1429,69 @@ function updateEncounters() {
 
 // ---------- itens (armas) e portão
 function resetLevel() {
-  enemies = []; shots = []; arrows = []; nums = []; seenTypes = new Set();
+  enemies = []; shots = []; arrows = []; nums = []; coins = []; frags = []; blasts = []; seenTypes = new Set();
+  coinCount = 0;
   ENCOUNTERS.forEach(en => en.done = false);
   AMBUSHES.forEach(a => { a.state = 'idle'; a.wave = 0; a.delay = 0; });
   GATES.forEach((g, i) => { setGate(g, i === 0); g.lift = i === 0 ? 0 : 1; });
-  items = PEDESTALS.map(([tx, row, wid]) => ({ x: tx * TS + 4, y: row * TS, wid, ped: true }));
+  SECRETS.forEach(c => { c.found = false; c.reveal = 0; });
+  chests = CHESTS.map(c => ({ ...c, x: c.tx * TS + 4, y: c.row * TS, open: false, lid: 0 }));
+  items = PEDESTALS.map(([tx, row, wid]) => ({ kind: 'weapon', x: tx * TS + 4, y: row * TS, wid, group: 'start', lift: 18 }));
   pl.weapon = null;
 }
+// item ou baú fechado mais perto do herói (no mesmo chão)
 function nearItem() {
   let best = null, bd = 14;
-  items.forEach(it => { const d = Math.abs(pl.x + pl.w / 2 - it.x); if (d < bd && Math.abs(pl.y + pl.h - it.y) < 14) { bd = d; best = it; } });
+  const px = pl.x + pl.w / 2, feet = pl.y + pl.h;
+  items.forEach(it => { const d = Math.abs(px - it.x); if (d < bd && Math.abs(feet - it.y) < 14) { bd = d; best = it; } });
+  if (!best) { bd = 20; chests.forEach(c => { const d = Math.abs(px - c.x); if (!c.open && d < bd && Math.abs(feet - c.y) < 14) { bd = d; best = c; } }); }
   return best;
+}
+const secretOf = (x, y) => SECRETS.find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
+// quanto do baú/item aparece (0 dentro de uma sala secreta ainda não achada)
+const shownAt = (x, y) => { const c = secretOf(Math.floor(x / TS), Math.floor((y - 4) / TS)); return c ? c.reveal : 1; };
+function openChest(c) {
+  c.open = true; sfx.chest(); shake = Math.max(shake, 2);
+  burst(c.x, c.y - 8, 24, ['#ffffff', '#ffd23f', '#f5801e'], 2, -.02, [14, 26]);
+  const g = 'chest' + c.tx;
+  items.push({ kind: 'weapon', wid: c.wid, x: c.x - 12, y: c.y, group: g, lift: 26 });
+  items.push({ kind: 'potion', x: c.x + 12, y: c.y, group: g, lift: 26 });
+  banner('Baú aberto!', 'escolha: a arma nova ou uma poção de cura');
 }
 function pickItem() {
   const it = nearItem();
   if (!it || mode !== 'play') return;
+  if (it.tx !== undefined) { openChest(it); return; }
+  items = items.filter(o => o !== it);
+  // escolha: as outras opções do mesmo grupo se desfazem
+  if (it.group) {
+    items.filter(o => o.group === it.group).forEach(o => burst(o.x, o.y - o.lift + 2, 18, SMOKE, 1.2, -.01, [14, 24], 2));
+    items = items.filter(o => o.group !== it.group);
+    if (it.group === 'start') { setGate(GATES[0], false); sfx.gate(); shake = Math.max(shake, 2); }
+  }
+  burst(it.x, it.y - it.lift + 2, 20, ['#ffffff', '#ffd23f', it.kind === 'potion' ? '#ff4d6d' : WEAPONS[it.wid].tint], 1.8);
+  sfx.pickup();
+  if (it.kind === 'potion') {
+    pl.potions++; renderHp(); flashPot();
+    banner('Poção de cura', `agora você tem ${pl.potions} (Q para beber)`);
+    return;
+  }
   const old = pl.weapon;
   pl.weapon = it.wid; pl.atk = null; pl.combo = 0; pl.carry = WEAPONS[it.wid].idle;
-  items = items.filter(o => o !== it);
-  if (it.ped) {
-    // escolha inicial: a outra arma se desfaz e o portão abre
-    items.filter(o => o.ped).forEach(o => burst(o.x, o.y - 16, 18, SMOKE, 1.2, -.01, [14, 24], 2));
-    items = items.filter(o => !o.ped);
-    setGate(GATES[0], false); sfx.gate(); shake = Math.max(shake, 2);
-  } else if (old) items.push({ x: it.x, y: it.y, wid: old });
-  burst(it.x, it.y - 16, 20, ['#ffffff', '#ffd23f', WEAPONS[it.wid].tint], 1.8);
-  sfx.pickup(); renderHp();
-  banner(WEAPONS[it.wid].name, it.ped ? 'o portão se abriu' : 'arma trocada');
+  if (old && it.group !== 'start') items.push({ kind: 'weapon', x: pl.x + pl.w / 2 - pl.face * 14, y: it.y, wid: old, lift: 12 });
+  renderHp();
+  banner(WEAPONS[it.wid].name, it.group === 'start' ? 'o portão se abriu' : old ? 'a arma antiga ficou no chão' : 'arma equipada');
+}
+function updateSecrets() {
+  const tx = Math.floor((pl.x + pl.w / 2) / TS), ty = Math.floor((pl.y + pl.h / 2) / TS);
+  SECRETS.forEach(c => {
+    if (!c.found && mode === 'play' && tx >= c.x0 && tx <= c.x1 && ty >= c.y0 && ty <= c.y1) {
+      c.found = true; sfx.secret(); banner('Sala secreta!', 'você achou um baú escondido');
+    }
+    if (c.found) c.reveal = Math.min(1, c.reveal + .05);
+    // dica: um ventinho sai das frestas da parede falsa
+    else if (T % 24 === 0) { const [wx, a, b] = c.wall; addP((wx + (c.dir > 0 ? 1 : 0)) * TS, rand(a * TS, (b + 1) * TS), c.dir * rand(.2, .4), rand(-.08, .02), irand(40, 70), ['#8fe3cf', '#5fd1b8', '#2c6a64']); }
+  });
 }
 
 // câmera: horizontal segue o herói; vertical só muda quando ele pisa num chão novo
@@ -1362,8 +1514,9 @@ function update() {
   if (mode === 'title' && T % 8 === 0) drawPicks();
   if (mode === 'exit') updateExit();
   if (mode === 'dead' && ++deadT === 80) showDead();
-  if (mode === 'play') updateEncounters();
-  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); updateShots(); }
+  if (mode === 'play') { updateEncounters(); updateSecrets(); }
+  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); updateShots(); updateFrags(); updateCoins(); }
+  chests.forEach(c => { if (c.open && c.lid < 1) c.lid = Math.min(1, c.lid + .15); });
   // portões: abrem devagar (sobem) e fecham rápido (descem)
   GATES.forEach(g => {
     const want = g.closed ? 0 : 1;
@@ -1430,6 +1583,12 @@ function draw() {
   if (shake) { cx = clamp(cx + Math.round(rand(-shake, shake)), 0, MW * TS - W); cy = clamp(cy + Math.round(rand(-shake, shake) * .7), 0, MH * TS - H); }
   lc.globalCompositeOperation = 'source-over';
   lc.drawImage(lvl, cx, cy, W, H, 0, 0, W, H);
+  // salas secretas aparecem aos poucos quando achadas
+  SECRETS.forEach(c => {
+    if (c.reveal <= 0) return;
+    const X = (c.x0 - 1) * TS, Y = (c.y0 - 1) * TS, w = (c.x1 - c.x0 + 3) * TS, h = (c.y1 - c.y0 + 3) * TS;
+    lc.globalAlpha = c.reveal; lc.drawImage(lvlS, X, Y, w, h, X - cx, Y - cy, w, h); lc.globalAlpha = 1;
+  });
 
   // porta: brilho pulsando
   const pulse = .5 + .5 * Math.sin(T / 20);
@@ -1447,10 +1606,13 @@ function draw() {
   });
 
   drawPedestals(cx, cy);
+  coins.forEach(c => drawCoin(c, cx, cy));
   drawGate(cx, cy);
   enemies.forEach(e => drawEnemy(e, cx, cy));
   shots.forEach(b => drawShot(b, cx, cy));
   arrows.forEach(ar => drawArrow(ar, cx, cy));
+  frags.forEach(f => { R(Math.round(f.x - cx), Math.round(f.y - cy), 2, 1, T % 2 ? '#ffd23f' : '#ffffff'); });
+  blasts.forEach(b => drawBlast(b, cx, cy));
 
   // herói
   const hx = Math.round(pl.x + pl.w / 2 - cx), hy = Math.round(pl.y + pl.h - cy);
@@ -1498,9 +1660,9 @@ function draw() {
   // sem escuridão nem neblina: só um brilho leve na porta e nas armas
   lc.globalCompositeOperation = 'lighter';
   lc.globalAlpha = .3 + .2 * pulse; lc.drawImage(GLOW_O, DOOR.x + 8 - cx - 36, DOOR.y + 16 - cy - 36, 72, 72);
-  lc.globalAlpha = .5; items.forEach(it => lc.drawImage(GLOW_O, it.x - cx - 18, it.y - 16 - cy - 18, 36, 36));
+  items.forEach(it => { lc.globalAlpha = .5 * shownAt(it.x, it.y); lc.drawImage(GLOW_O, it.x - cx - 18, it.y - it.lift + 2 - cy - 18, 36, 36); });
   lc.globalAlpha = 1; lc.globalCompositeOperation = 'source-over';
-  if (pl.weapon === 'arco' && mouseScr && mode === 'play') {
+  if (pl.weapon && WEAPONS[pl.weapon].combo[0].ranged && mouseScr && mode === 'play') {   // mira de qualquer arma de longe
     const mx = Math.round(mouseScr.x), my = Math.round(mouseScr.y), c = '#ffd23f';
     R(mx - 4, my, 3, 1, c); R(mx + 2, my, 3, 1, c); R(mx, my - 4, 1, 3, c); R(mx, my + 2, 1, 3, c);
   }
@@ -1537,6 +1699,20 @@ function drawWeapon(id, x, y, ang, face, pull = 0) {
     p(0, -7, '#d9a640'); p(0, 7, '#d9a640');
     for (let k = 0; k <= 1; k += .1) { p(-pull * k, -7 + 7 * k, '#e8e0d0'); p(-pull * k, 7 - 7 * k, '#e8e0d0'); }
     if (pull > 0) { for (let t = -pull; t <= 9; t += .5) p(t, 0, '#c8a26b'); p(9.5, 0, '#e3e9ee'); p(10, 0, '#ffffff'); p(-pull, -1, '#ff6b3d'); p(-pull, 1, '#ff6b3d'); }
+  } else if (id === 'lanca') {
+    // cabo comprido, borla vermelha e ponta de aço
+    for (let t = -6; t <= 21; t += .5) { p(t, 0, '#7a4a26'); p(t, .7, '#4a2c18'); }
+    p(20, 1.5, '#ff4d6d'); p(20.5, 2.2, '#ff4d6d'); p(19.5, 2, '#c8203f');
+    for (let t = 21; t <= 27; t += .5) { const hw = (27 - t) * .45; for (let s = -hw; s <= hw; s += .5) p(t, s, s < 0 ? '#e8eef3' : '#a9b4be'); }
+    p(27.5, 0, '#ffffff');
+  } else if (id === 'besta') {
+    // coronha, trilho de metal, arco curto na frente e o virote encaixado (some logo depois do disparo)
+    for (let t = -4; t <= 10; t += .5) { p(t, 0, '#6b4226'); p(t, 1, '#4a2c18'); }
+    for (let t = 1; t <= 10; t += .5) p(t, -.8, '#7d8790');
+    for (let s = -6; s <= 6; s += .5) { const t = 9 - s * s / 16; p(t, s, '#3a4248'); p(t + .6, s, '#8a93a6'); }
+    for (let k = 0; k <= 1; k += .1) { p(9 - 36 / 16 + (1 - 9 + 36 / 16) * k, -6 + 6 * k, '#e8e0d0'); p(9 - 36 / 16 + (1 - 9 + 36 / 16) * k, 6 - 6 * k, '#e8e0d0'); }
+    const atk = pl.atk, fired = id === pl.weapon && atk && atk.f >= atk.s.wind;
+    if (!fired) { for (let t = 1; t <= 11; t += .5) p(t, -1.5, '#5a3a24'); p(11.5, -1.5, '#c3ccd4'); p(12, -1.5, '#ffffff'); p(1, -2.2, '#f5801e'); }
   }
 }
 function drawArrow(ar, cx, cy) {
@@ -1545,6 +1721,7 @@ function drawArrow(ar, cx, cy) {
   if (x < -12 || x > W + 12 || y < -12 || y > H + 12) return;
   if (ar.stuck && ar.stuck < 15 && T % 2) return;
   if (ar.heavy && !ar.stuck) for (let t = -10; t <= 1; t += .5) { R(Math.round(x + ux * t - uy), Math.round(y + uy * t + ux), 1, 1, '#ffd23f'); R(Math.round(x + ux * t + uy), Math.round(y + uy * t - ux), 1, 1, '#ffd23f'); }
+  if (ar.s.bolt) { for (let t = -7; t <= 0; t += .5) { const c = t > -2 ? '#ffffff' : t > -3 ? '#c3ccd4' : t < -5.5 ? '#f5801e' : '#5a3a24'; R(Math.round(x + ux * t), Math.round(y + uy * t), 1, 1, c); R(Math.round(x + ux * t - uy * .8), Math.round(y + uy * t + ux * .8), 1, 1, c); } return; }
   for (let t = -9; t <= 0; t += .5) R(Math.round(x + ux * t), Math.round(y + uy * t), 1, 1, t > -1.5 ? '#ffffff' : t > -2.5 ? '#c3ccd4' : t < -7.5 ? '#ff6b3d' : '#c8a26b');
 }
 function weaponAngle() {
@@ -1562,6 +1739,13 @@ function drawSlash(px, py) {
   if (!a) return;
   const s = a.s, f = a.f - s.wind;
   if (f < 0 || f > s.act + 5) return;
+  if (s.thrust) {
+    const fk = f >= s.act ? 1 - (f - s.act) / 6 : 1, len = s.reach * Math.min(1, (f + 1) / s.act);
+    lc.globalAlpha = fk;
+    for (let r = 10; r <= len; r++) { const c = r > len - 6 ? '#ffffff' : WEAPONS[pl.weapon].tint; R(Math.round(px + r * pl.face), Math.round(py), 1, 1, c); if (r % 3 === 0) R(Math.round(px + r * pl.face), Math.round(py) - 1, 1, 1, '#8fa3b5'); }
+    lc.globalAlpha = 1;
+    return;
+  }
   const cur = Math.min(1, (f + 1) / s.act), fk = f >= s.act ? 1 - (f - s.act) / 6 : 1;
   const a0 = s.arc[0], a1 = a0 + (s.arc[1] - a0) * cur, n = Math.ceil(Math.abs(a1 - a0) / 4);
   for (let i = 0; i <= n; i++) {
@@ -1577,11 +1761,50 @@ function drawPedestals(cx, cy) {
     const X = tx * TS + 4 - cx, Y = row * TS - cy;
     R(X - 6, Y - 6, 12, 6, '#1a404c'); R(X - 8, Y - 8, 16, 2, '#2c6470'); R(X - 8, Y - 8, 16, 1, '#4aa383'); R(X - 5, Y - 4, 10, 1, '#102a32'); R(X + 5, Y - 6, 1, 6, '#0d232a');
   });
+  chests.forEach(c => { const a = shownAt(c.x, c.y); if (a > 0) { lc.globalAlpha = a; drawChest(c, cx, cy); lc.globalAlpha = 1; } });
   items.forEach(it => {
-    const X = it.x - cx, Y = it.y - cy - 18 + Math.round(Math.sin(T / 18 + it.x) * 1.5);
-    if (T % 9 === 0) addP(it.x + rand(-6, 6), it.y - 14, 0, rand(-.5, -.2), 20, ['#fff6d8', '#ffd23f']);
-    drawWeapon(it.wid, X - 4, Y + 6, -55, 1);
+    const a = shownAt(it.x, it.y);
+    if (a <= 0) return;
+    const X = it.x - cx, Y = it.y - cy - it.lift + Math.round(Math.sin(T / 18 + it.x) * 1.5);
+    if (T % 9 === 0) addP(it.x + rand(-6, 6), it.y - it.lift + 4, 0, rand(-.5, -.2), 20, it.kind === 'potion' ? ['#ffd0da', '#ff4d6d'] : ['#fff6d8', '#ffd23f']);
+    lc.globalAlpha = a;
+    if (it.kind === 'potion') drawPotion(X, Y + 2);
+    else drawWeapon(it.wid, X - 4, Y + 6, -55, 1);
+    lc.globalAlpha = 1;
   });
+}
+function drawPotion(x, y) {
+  R(x - 3, y - 3, 7, 8, '#140a1f'); R(x - 2, y - 2, 5, 6, '#ff4d6d'); R(x - 2, y - 2, 5, 1, '#ff8fa3'); R(x - 1, y - 1, 1, 2, '#ffd0da');
+  R(x - 2, y - 6, 5, 3, '#140a1f'); R(x - 1, y - 5, 3, 2, '#c8a26b');
+}
+// baú de madeira com cantoneiras douradas; a tampa abre para trás
+function drawChest(c, cx, cy) {
+  const X = Math.round(c.x - cx), Y = Math.round(c.y - cy);
+  R(X - 8, Y - 9, 16, 9, '#140a1f'); R(X - 7, Y - 8, 14, 8, '#7a4a26'); R(X - 7, Y - 8, 14, 1, '#a86a3a');
+  R(X - 7, Y - 5, 14, 1, '#4a2c18'); R(X - 7, Y - 8, 2, 8, '#d9a640'); R(X + 5, Y - 8, 2, 8, '#d9a640');
+  if (!c.open) {
+    R(X - 8, Y - 13, 16, 5, '#140a1f'); R(X - 7, Y - 12, 14, 4, '#8c5a30'); R(X - 7, Y - 12, 14, 1, '#b07a45');
+    R(X - 7, Y - 12, 2, 4, '#d9a640'); R(X + 5, Y - 12, 2, 4, '#d9a640'); R(X - 1, Y - 10, 2, 3, '#ffd23f');
+    if (T % 50 < 4) R(X - 6 + (T % 50) * 3, Y - 12, 1, 1, '#ffffff');
+  } else {
+    const h = Math.round(4 + 3 * c.lid);
+    R(X - 8, Y - 9 - h, 16, h, '#140a1f'); R(X - 7, Y - 8 - h, 14, h - 1, '#5a3a20'); R(X - 7, Y - 8 - h, 14, 1, '#8c5a30');
+    R(X - 6, Y - 8, 12, 2, '#ffd23f');
+  }
+}
+function drawCoin(c, cx, cy) {
+  const x = Math.round(c.x - cx), y = Math.round(c.y - cy), f = (T + c.t * 3 >> 3) % 4;
+  if (x < -4 || x > W + 4 || y < -4 || y > H + 4) return;
+  const w = f === 0 ? 3 : f === 2 ? 1 : 2;
+  R(x - (w >> 1) - 1, y - 2, w + 2, 5, '#5a3f0a'); R(x - (w >> 1), y - 1, w, 3, '#ffd23f'); if (w > 1) R(x - (w >> 1), y - 1, 1, 1, '#fff6c2');
+}
+// explosão: clarão branco, bola de fogo e anel se abrindo
+function drawBlast(b, cx, cy) {
+  const k = b.t / b.max, x = b.x - cx, y = b.y - cy, r = b.r * (.4 + k * .8);
+  const disc = (rr, c) => { for (let dy = -Math.floor(rr); dy <= rr; dy++) { const w = Math.floor(Math.sqrt(Math.max(0, rr * rr - dy * dy))); R(Math.round(x) - w, Math.round(y) + dy, w * 2 + 1, 1, c); } };
+  if (k < .15) disc(r * .8, '#ffffff');
+  else if (k < .6) { lc.globalAlpha = .9; disc(r, '#e8431f'); disc(r * .72, '#ff8c1a'); disc(r * .45, '#ffd23f'); disc(r * .2, '#fff6c2'); lc.globalAlpha = 1; }
+  else { lc.globalAlpha = 1 - k; const n = 28; for (let i = 0; i < n; i++) { const an = i / n * Math.PI * 2; R(Math.round(x + Math.cos(an) * r), Math.round(y + Math.sin(an) * r), 1, 1, '#ff8c1a'); } lc.globalAlpha = 1; }
 }
 function drawGate(cx, cy) {
   GATES.forEach(g => {
@@ -1689,14 +1912,15 @@ function drawShot(b, cx, cy) {
 }
 // números de dano em fonte de pixel 3x5
 const DIG = ['111101101101111', '110010010010111', '111001111100111', '111001011001111', '101101111001001', '111100111001111', '111100111101111', '111001010010010', '111101111101111', '111101111001111'];
+DIG['!'] = '010010010000010';
 function drawNum(n, cx, cy) {
-  const s = n.s, x0 = Math.round(n.x - cx - (s.length * 4 - 1) / 2), y0 = Math.round(n.y - cy);
+  const s = n.s, z = n.big ? 2 : 1, x0 = Math.round(n.x - cx - (s.length * 4 - 1) * z / 2), y0 = Math.round(n.y - cy);
   lc.globalAlpha = n.t > 35 ? (45 - n.t) / 10 : 1;
   for (const pass of [0, 1]) for (let i = 0; i < s.length; i++) {
-    const b = DIG[+s[i]];
+    const b = DIG[s[i] === '!' ? '!' : +s[i]];
     for (let k = 0; k < 15; k++) if (b[k] === '1') {
-      const x = x0 + i * 4 + k % 3, y = y0 + Math.floor(k / 3);
-      if (pass === 0) R(x - 1, y - 1, 3, 3, '#140a1f'); else R(x, y, 1, 1, n.col);
+      const x = x0 + (i * 4 + k % 3) * z, y = y0 + Math.floor(k / 3) * z;
+      if (pass === 0) R(x - 1, y - 1, z + 2, z + 2, '#140a1f'); else R(x, y, z, z, n.col);
     }
   }
   lc.globalAlpha = 1;
@@ -1759,14 +1983,33 @@ function updateTip() {
   if (it !== tipItem) {
     tipItem = it; tip.hidden = !it;
     if (it) {
-      const w = WEAPONS[it.wid];
-      $('tipName').textContent = w.name; $('tipDesc').textContent = w.desc;
-      $('tipHeavy').innerHTML = `Botão direito: <b>${w.heavyName}</b>, ${w.heavyDesc}`;
-      $('tipStats').innerHTML = w.stats.map(([k, v]) => `<span>${k}</span><i>${'■'.repeat(v)}${'□'.repeat(3 - v)}</i>`).join('');
+      const choice = it.group && it.group !== 'start' ? 'Escolha: pegar este item faz a outra opção do baú sumir.' : '';
+      $('tipAct').textContent = it.tx !== undefined ? 'abrir' : 'pegar';
+      $('tipStats').innerHTML = ''; $('tipHeavy').innerHTML = ''; $('tipNote').textContent = '';
+      if (it.tx !== undefined) {
+        $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.';
+      } else if (it.kind === 'potion') {
+        $('tipName').textContent = 'Poção de cura'; $('tipDesc').textContent = 'Cura metade da vida quando você bebe (Q).';
+        $('tipNote').textContent = choice;
+      } else {
+        const w = WEAPONS[it.wid];
+        $('tipName').textContent = w.name; $('tipDesc').textContent = w.desc;
+        $('tipHeavy').innerHTML = `Botão direito: <b>${w.heavyName}</b>, ${w.heavyDesc}`;
+        $('tipStats').innerHTML = w.stats.map(([k, v]) => `<span>${k}</span><i>${'■'.repeat(v)}${'□'.repeat(3 - v)}</i>`).join('');
+        $('tipNote').textContent = [w.note, choice].filter(Boolean).join(' ');
+      }
     }
   }
-  if (it) { tip.style.left = (it.x - cam.x) / W * 100 + '%'; tip.style.top = (it.y - 34 - cam.y) / H * 100 + '%'; }
+  if (it) {
+    // abre acima do item; se não couber (item perto do topo da tela), abre embaixo; nunca sai pelas laterais
+    const hud = $('hud'), sw = hud.clientWidth, shh = hud.clientHeight, k = sw / W, lift = it.lift || 14;
+    const tw = tip.offsetWidth, th = tip.offsetHeight, gap = 4;
+    const cxp = (it.x - cam.x) * k, above = (it.y - lift - 16 - cam.y) * k - th, below = (it.y + 2 - cam.y) * k;
+    tip.style.left = clamp(cxp - tw / 2, gap, sw - tw - gap) + 'px';
+    tip.style.top = clamp(above >= gap ? above : below, gap, shh - th - gap) + 'px';
+  }
 }
+function renderCoins() { $('coinN').textContent = coinCount; const el = $('coins'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 function flashPot() { const el = $('pot'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
 function renderHero() {
   const c = CHARS[heroIdx];
@@ -1809,7 +2052,7 @@ function startGame() {
   ac();
   ['titleScreen', 'pauseScreen', 'winScreen', 'deadScreen'].forEach(id => $(id).hidden = true);
   bannerQ.length = 0;
-  resetPlayer(); resetLevel(); renderHp(); playT = 0; renderTimer(); parts = []; fade = 1; hitstop = 0; shake = 0; hurtFx = 0;
+  resetPlayer(); resetLevel(); renderHp(); renderCoins(); playT = 0; renderTimer(); parts = []; fade = 1; hitstop = 0; shake = 0; hurtFx = 0;
   mode = 'play';
   banner('Masmorra', 'escolha uma arma nos pedestais');
 }
@@ -1820,12 +2063,12 @@ function win() {
   Object.assign(pl, { vx: 0, vy: 0, roll: 0 });
   sfx.teleport();
 }
-function showDead() { $('deadScreen').hidden = false; $('retryBtn').focus({ preventScroll: true }); }
+function showDead() { $('deadCoins').textContent = coinCount; $('deadScreen').hidden = false; $('retryBtn').focus({ preventScroll: true }); }
 function showWin() {
   mode = 'won'; sfx.win();
   let best = playT;
   try { const b = +localStorage.getItem('masmorra-best'); if (b > 0 && b < best) best = b; localStorage.setItem('masmorra-best', best); } catch (e) {}
-  $('winTime').textContent = fmt(playT); $('winBest').textContent = fmt(best);
+  $('winTime').textContent = fmt(playT); $('winBest').textContent = fmt(best); $('winCoins').textContent = coinCount;
   $('winScreen').hidden = false; $('againBtn').focus({ preventScroll: true });
 }
 
