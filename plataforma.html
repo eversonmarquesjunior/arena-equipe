@@ -490,11 +490,11 @@ const WEAPONS = {
   arco: {
     name: 'Arco Simples', desc: 'Ataca de longe. Clique para mirar com o mouse; J atira para frente.', tint: '#e6d2a0', idle: 70, run: 115,
     heavyName: 'Flecha Perfurante', heavyDesc: 'atravessa todos os bugs no caminho.',
-    heavy: { ranged: true, wind: 42, act: 1, rec: 16, dmg: 34, kb: 4, stop: 6, shake: 3, speed: 9, pierce: true, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
-    stats: [['Dano', 1], ['Velocidade', 2], ['Alcance', 3]],
+    heavy: { ranged: true, wind: 42, act: 1, rec: 16, dmg: 40, kb: 4, stop: 6, shake: 3, speed: 9, pierce: true, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    stats: [['Dano', 2], ['Velocidade', 2], ['Alcance', 3]],
     // ranged: em vez de golpe, solta uma flecha no fim da preparação (wind)
     combo: [
-      { ranged: true, wind: 12, act: 1, rec: 10, dmg: 12, kb: 1.2, stop: 2, shake: 0, speed: 6, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+      { ranged: true, wind: 12, act: 1, rec: 10, dmg: 16, kb: 1.2, stop: 2, shake: 0, speed: 6, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     ],
   },
 };
@@ -615,10 +615,10 @@ carve(286, 4, 299, 9); carve(300, 6, 300, 9); plat(301, 10, 3);
 const START = { x: 6 * TS, y: 30 * TS };
 const DOOR = { x: 462 * TS, y: 14 * TS, w: 16, h: 32 };
 // salas secretas: a passagem é uma parede falsa (dá para atravessar) e a sala só aparece quando o herói entra
-// wall: [coluna, linha inicial, linha final] da parede falsa; dir: para que lado sai o "ventinho" de dica
+// wall: [coluna, linha inicial, linha final] da parede falsa (onde aparece o "?" de dica)
 const SECRETS = [
-  { x0: 112, y0: 26, x1: 130, y1: 33, wall: [130, 30, 33], dir: 1 },
-  { x0: 286, y0: 4, x1: 300, y1: 9, wall: [300, 6, 9], dir: 1 },
+  { x0: 112, y0: 26, x1: 130, y1: 33, wall: [130, 30, 33] },
+  { x0: 286, y0: 4, x1: 300, y1: 9, wall: [300, 6, 9] },
 ];
 const inSecret = (x, y) => SECRETS.some(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
 // baús: escolha entre a arma nova e uma poção
@@ -724,18 +724,19 @@ const GATES = [
 function setGate(g, closed) { g.closed = closed; for (let y = g.y0; y <= g.y1; y++) map[y][g.tx] = closed ? SOLID : AIR; }
 const PEDESTALS = [[12, 30, 'espada'], [22, 30, 'martelo'], [32, 30, 'arco']];
 // encontros: quando o herói passa da coluna "at", os inimigos da lista surgem ([tipo, coluna, linha do chão])
+// primeira fase: fora das emboscadas os bugs vêm quase sempre sozinhos, para o jogador aprender cada tipo com calma
 const ENCOUNTERS = [
   { at: 47, list: [['bug', 58, 30]] },
-  { at: 64, list: [['bug', 70, 30], ['shooter', 99, 30]] },
+  { at: 64, list: [['shooter', 99, 30]] },
   { at: 86, list: [['flyer', 95, 10]] },
   { at: 108, list: [['shield', 122, 14]] },
-  { at: 140, list: [['ghost', 154, 34], ['bug', 162, 34]] },
-  { at: 172, list: [['shooter', 198, 25], ['flyer', 186, 18]] },
-  { at: 262, list: [['flyer', 272, 18], ['flyer', 287, 17]] },
-  { at: 292, list: [['bug', 299, 26], ['shooter', 313, 18], ['flyer', 308, 8]] },
-  { at: 333, list: [['shield', 345, 8], ['bug', 353, 8]] },
-  { at: 422, list: [['flyer', 433, 9], ['flyer', 441, 8]] },
-  { at: 448, list: [['bug', 456, 18], ['shooter', 461, 18]] },
+  { at: 140, list: [['ghost', 154, 34]] },
+  { at: 172, list: [['bug', 198, 25]] },
+  { at: 262, list: [['flyer', 287, 17]] },
+  { at: 292, list: [['shooter', 313, 18]] },
+  { at: 333, list: [['shield', 345, 8]] },
+  { at: 422, list: [['flyer', 436, 9]] },
+  { at: 448, list: [['bug', 456, 18]] },
 ];
 // salas de emboscada: ao entrar, os portões fecham e vêm ondas de inimigos
 const AMBUSHES = [
@@ -839,7 +840,9 @@ function dust(x, y, n, dir = 0) { for (let i = 0; i < n; i++) addP(x + rand(-3, 
 
 // ---------- jogador
 const RUN = 1.9, ACC_G = .38, ACC_A = .24, FRIC = .34;
-const GRAV = .32, JUMP = 4.7, JUMP2 = 4.2, MAXFALL = 6;
+const GRAV = .32, MAXFALL = 6;   // inimigos e moedas
+// herói: gravidade menor e pulo mais lento, quase na mesma altura de antes, mas fica mais tempo no ar
+const P_GRAV = .24, JUMP = 4.2, JUMP2 = 3.7, P_MAXFALL = 5.2;
 const COYOTE = 6, BUFFER = 7, ROLL_T = 20, ROLL_SPD = 3.4, ROLL_CD = 28;
 const pl = { x: 0, y: 0, w: 10, h: 28, vx: 0, vy: 0, face: 1, ground: false, coyote: 0, buf: 0, jumps: 0, cut: false, roll: 0, rollCd: 0, drop: 0, anim: 0, land: 0, safe: null,
   hp: 100, max: 100, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
@@ -953,7 +956,7 @@ function updatePlayer() {
   // soltar o pulo cedo = pulo mais baixo
   if (pl.cut && !held('jump') && pl.vy < -1.6) { pl.vy *= .45; pl.cut = false; }
   const hang = Math.abs(pl.vy) < .7 && held('jump') ? .6 : 1;
-  pl.vy = Math.min(MAXFALL, pl.vy + GRAV * hang);
+  pl.vy = Math.min(P_MAXFALL, pl.vy + P_GRAV * hang);
 
   moveX(pl, pl.vx);
   const wasGround = pl.ground, fallV = pl.vy;
@@ -961,7 +964,7 @@ function updatePlayer() {
   if (pl.ground) {
     pl.vy = 0;
     if (!wasGround && fallV > 2) {
-      const k = clamp((fallV - 2) / 4, 0, 1);
+      const k = clamp((fallV - 2) / (P_MAXFALL - 2), 0, 1);
       dust(pl.x + pl.w / 2, pl.y + pl.h, 4 + Math.round(k * 10)); sfx.land(k); pl.land = 5 + Math.round(k * 5);
     }
     // guarda o último chão firme (longe da beirada) para quando cair no buraco
@@ -1121,14 +1124,15 @@ function hitCheck(a) {
 function addNum(v, x, y, col, big) { nums.push({ s: String(v), x: x + rand(-3, 3), y, col, t: 0, big }); }
 
 // ---------- poção de cura
-const DRINK_T = 40, HEAL = .5;
+const DRINK_T = 40;
 function startDrink() {
   if (mode !== 'play' || pl.drink > 0 || pl.atk || pl.roll > 0 || pl.hurt > 0) return;
   if (pl.potions <= 0 || pl.hp >= pl.max) { sfx.nope(); flashPot(); return; }
   pl.drink = DRINK_T; pl.atkBuf = 0; pl.heavyBuf = 0;
 }
 function finishDrink() {
-  const h = Math.min(pl.max - pl.hp, Math.round(pl.max * HEAL));
+  // a poção sempre enche a vida toda, não importa quanto falte
+  const h = pl.max - pl.hp;
   pl.potions--; pl.hp += h;
   addNum(h, pl.x + pl.w / 2, pl.y - 4, '#4ade80');
   burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 22, ['#ffffff', '#c8ffd8', '#4ade80'], 1.6, -.03, [14, 26]);
@@ -1434,7 +1438,7 @@ function resetLevel() {
   ENCOUNTERS.forEach(en => en.done = false);
   AMBUSHES.forEach(a => { a.state = 'idle'; a.wave = 0; a.delay = 0; });
   GATES.forEach((g, i) => { setGate(g, i === 0); g.lift = i === 0 ? 0 : 1; });
-  SECRETS.forEach(c => { c.found = false; c.reveal = 0; });
+  SECRETS.forEach(c => { c.found = false; c.reveal = 0; c.hint = 0; });
   chests = CHESTS.map(c => ({ ...c, x: c.tx * TS + 4, y: c.row * TS, open: false, lid: 0 }));
   items = PEDESTALS.map(([tx, row, wid]) => ({ kind: 'weapon', x: tx * TS + 4, y: row * TS, wid, group: 'start', lift: 18 }));
   pl.weapon = null;
@@ -1489,8 +1493,9 @@ function updateSecrets() {
       c.found = true; sfx.secret(); banner('Sala secreta!', 'você achou um baú escondido');
     }
     if (c.found) c.reveal = Math.min(1, c.reveal + .05);
-    // dica: um ventinho sai das frestas da parede falsa
-    else if (T % 24 === 0) { const [wx, a, b] = c.wall; addP((wx + (c.dir > 0 ? 1 : 0)) * TS, rand(a * TS, (b + 1) * TS), c.dir * rand(.2, .4), rand(-.08, .02), irand(40, 70), ['#8fe3cf', '#5fd1b8', '#2c6a64']); }
+    // dica: um "?" surge na parede falsa quando o herói passa perto (e some quando ele se afasta)
+    const [wx, a, b] = c.wall, near = !c.found && Math.abs(pl.x + pl.w / 2 - (wx + .5) * TS) < 72 && Math.abs(pl.y + pl.h / 2 - (a + b + 1) / 2 * TS) < 56;
+    c.hint = near ? Math.min(1, c.hint + .08) : Math.max(0, c.hint - .05);
   });
 }
 
@@ -1666,6 +1671,7 @@ function draw() {
     const mx = Math.round(mouseScr.x), my = Math.round(mouseScr.y), c = '#ffd23f';
     R(mx - 4, my, 3, 1, c); R(mx + 2, my, 3, 1, c); R(mx, my - 4, 1, 3, c); R(mx, my + 2, 1, 3, c);
   }
+  SECRETS.forEach(c => { if (c.hint > 0) drawHint(c, cx, cy); });
   nums.forEach(n => drawNum(n, cx, cy));
   if (hurtFx) { lc.fillStyle = `rgba(255,40,70,${.28 * hurtFx})`; lc.fillRect(0, 0, W, H); }
   if (fade > 0) { lc.fillStyle = `rgba(0,0,0,${fade})`; lc.fillRect(0, 0, W, H); }
@@ -1679,6 +1685,17 @@ function draw() {
 }
 
 const R = (x, y, w, h, c) => { lc.fillStyle = c; lc.fillRect(x, y, w, h); };
+// "?" em pixel art (5x7, desenhado em dobro) com contorno escuro, flutuando sobre a parede falsa
+const HINT_Q = ['.###.', '#...#', '....#', '..##.', '..#..', '.....', '..#..'];
+function drawHint(c, cx, cy) {
+  const [wx, a, b] = c.wall, X = Math.round((wx + .5) * TS - 5 - cx), Y = Math.round((a + b + 1) / 2 * TS - 7 - cy + Math.sin(T / 12) * 1.5);
+  lc.globalAlpha = c.hint;
+  [[-1, 0], [1, 0], [0, -1], [0, 1], [0, 0]].forEach(([ox, oy], i) => {
+    const col = i < 4 ? '#140a1f' : T % 40 < 20 ? '#ffd23f' : '#ffe680';
+    HINT_Q.forEach((row, y) => { for (let x = 0; x < 5; x++) if (row[x] === '#') R(X + x * 2 + ox, Y + y * 2 + oy, 2, 2, col); });
+  });
+  lc.globalAlpha = 1;
+}
 // arma desenhada pixel a pixel a partir da mão (x, y), girada pelo ângulo
 function drawWeapon(id, x, y, ang, face, pull = 0) {
   const a = ang * Math.PI / 180, dx = Math.cos(a) * face, dy = Math.sin(a), nx = -dy, ny = dx;
@@ -1989,7 +2006,7 @@ function updateTip() {
       if (it.tx !== undefined) {
         $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.';
       } else if (it.kind === 'potion') {
-        $('tipName').textContent = 'Poção de cura'; $('tipDesc').textContent = 'Cura metade da vida quando você bebe (Q).';
+        $('tipName').textContent = 'Poção de cura'; $('tipDesc').textContent = 'Enche toda a vida quando você bebe (Q).';
         $('tipNote').textContent = choice;
       } else {
         const w = WEAPONS[it.wid];
