@@ -1,5 +1,5 @@
 // ===== Bioma 2: Esgoto Tóxico =====
-// pequeno por enquanto, para testar as armas da lojinha; poças de gosma machucam e devolvem ao chão firme
+// pequeno por enquanto (vem logo depois da Masmorra, antes da Lojinha); poças de gosma machucam e devolvem ao chão firme
 // inspirado no Toxic Sewers de Dead Cells: verde musgo claro com tochas vermelhas
 
 // cores do mapa: verde musgo claro
@@ -10,10 +10,11 @@ const PAL_SEWER = {
   under: '#2a3a20', drip: '#6fae3e', lit: '#7f9f5f', shade: '#33462a',
 };
 const FLAME_RED = ['#fff0e0', '#ff9a8a', '#ff4d4d', '#a01f2a'];
+const SPORES_SEWER = ['#4f7a33', '#b5ff7a', '#4f7a33'];
 
 defBiome('esgoto', {
-  name: 'Esgoto Tóxico', sub: 'cuidado com as poças verdes: a gosma machuca', next: null,
-  w: 112, h: 40, pal: PAL_SEWER, flame: FLAME_RED, torchGlow: GLOW_R, barrel: 'metal', spores: ['#4f7a33', '#b5ff7a', '#4f7a33'],
+  name: 'Esgoto Tóxico', sub: 'cuidado com as poças verdes: a gosma machuca',
+  w: 112, h: 40, pal: PAL_SEWER, flame: FLAME_RED, torchGlow: GLOW_R, barrel: 'metal', spores: SPORES_SEWER,
   start: { x: 4 * TS, y: 34 * TS },
   door: { x: 105 * TS, y: 30 * TS, w: 16, h: 32 },
 

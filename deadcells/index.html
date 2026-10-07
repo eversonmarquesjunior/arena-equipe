@@ -59,13 +59,16 @@
       </div>
       <div class="overlay" id="deadScreen" hidden>
         <h2>Você <span>caiu</span></h2>
-        <p class="dim">Os bugs venceram desta vez. Moedas perdidas: <b id="deadCoins">0</b></p>
+        <p class="dim">Os bugs venceram desta vez (<span id="deadWhere"></span>). Moedas perdidas: <b id="deadCoins">0</b></p>
+        <p class="dim">Morreu, volta do início: a partida recomeça na Fase 1.</p>
         <div class="row"><button id="retryBtn">Tentar de novo</button><button class="ghost" id="deadHeroBtn">Trocar herói</button></div>
       </div>
       <div class="overlay" id="winScreen" hidden>
-        <h2>Saída <span>encontrada!</span></h2>
-        <p class="stats">Tempo: <b id="winTime">0s</b> · Recorde: <b id="winBest">0s</b> · Moedas: <b id="winCoins">0</b></p>
-        <p class="dim">Você atravessou a masmorra, passou pela lojinha e saiu do Esgoto Tóxico! Em breve: mais biomas.</p>
+        <h2>Fase 1 <span>concluída!</span></h2>
+        <p class="stats">Tempo: <b id="winTime">0s</b> · Moedas: <b id="winCoins">0</b></p>
+        <div class="ranks" id="winRanks"></div>
+        <p class="dim" id="winNote" hidden>Modo teste: estes tempos não entram no ranking.</p>
+        <p class="dim">Em breve: Ossuário, Sala Segura e o primeiro chefe.</p>
         <div class="row"><button id="againBtn">Jogar de novo</button><button class="ghost" id="winHeroBtn">Trocar herói</button></div>
       </div>
     </div>
@@ -83,8 +86,9 @@
 <script src="src/motor/mapa.js"></script>
 <!-- biomas, na ordem do jogo (é a mesma ordem do menu de teste) -->
 <script src="src/biomas/masmorra.js"></script>
-<script src="src/biomas/loja.js"></script>
 <script src="src/biomas/esgoto.js"></script>
+<script src="src/biomas/loja.js"></script>
+<script src="src/fases.js"></script>
 <script src="src/jogo/estado.js"></script>
 <script src="src/jogo/heroi.js"></script>
 <script src="src/jogo/inimigos.js"></script>

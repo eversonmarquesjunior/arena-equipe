@@ -4,7 +4,7 @@ const AIR = 0, SOLID = 1, PLAT = 2;
 const BOTTOM = Infinity;   // carve(..., BOTTOM): escava até o fim do mapa (buraco sem fundo)
 
 // biomas, na ordem em que os arquivos são carregados (é a ordem do menu de teste)
-// cada bioma diz onde o herói começa (start), a porta de saída (door) e para onde ela leva (next)
+// cada bioma diz onde o herói começa (start) e onde fica a porta de saída (door); para onde ela leva vem de PHASES (fases.js)
 // shop = é uma loja (aparece separado no menu de teste)
 const BIOMES = {};
 const BIOME_LISTS = ['torches', 'windows', 'barrels', 'chains', 'pipes', 'pools', 'secrets', 'chests', 'gates', 'pedestals', 'shopItems', 'encounters', 'ambushes'];

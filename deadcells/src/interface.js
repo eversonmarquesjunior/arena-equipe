@@ -3,7 +3,10 @@
 // ---------- interface
 const $ = id => document.getElementById(id);
 const fmt = f => { const s = Math.floor(f / 60); return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`; };
-function renderTimer() { $('timer').textContent = fmt(playT); }
+// tempos do ranking com décimos: 2m 05,3s
+const fmtR = f => { const d = Math.floor(f / 6), s = Math.floor(d / 10); return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')},${d % 10}s`; };
+// o cronômetro mostra o tempo da fase atual
+function renderTimer() { $('timer').textContent = `${PHASES[phase].name} · ${fmt(playT - phaseT0)}`; }
 // um aviso de cada vez; com wait = true ele espera o aviso atual terminar
 const bannerQ = [];
 function banner(title, sub, wait) {
@@ -105,7 +108,7 @@ function startGame() {
   ['titleScreen', 'pauseScreen', 'testScreen', 'winScreen', 'deadScreen', 'scrollPop'].forEach(id => $(id).hidden = true);
   bannerQ.length = 0; testMode = false; renderTest();   // recomeçar sai do ambiente de teste
   Object.assign(pl, { max: 100, dmgMul: 1, scrolls: 0 });   // partida nova: sem os bônus dos pergaminhos
-  resetLevel(); resetPlayer(); renderHp(); renderCoins(); playT = 0; renderTimer(); parts = []; fade = 1; hitstop = 0; shake = 0; hurtFx = 0;
+  resetLevel(); resetPlayer(); renderHp(); renderCoins(); playT = 0; phase = 0; phaseT0 = 0; splits = []; renderTimer(); parts = []; fade = 1; hitstop = 0; shake = 0; hurtFx = 0;
   mode = 'play';
   banner(L.name, L.sub);
 }
@@ -125,12 +128,21 @@ function win() {
   Object.assign(pl, { vx: 0, vy: 0, roll: 0 });
   sfx.teleport();
 }
-function showDead() { $('deadCoins').textContent = coinCount; $('deadScreen').hidden = false; $('retryBtn').focus({ preventScroll: true }); }
+function showDead() { $('deadWhere').textContent = `${PHASES[phase].name} · ${L.name}`; $('deadCoins').textContent = coinCount; $('deadScreen').hidden = false; $('retryBtn').focus({ preventScroll: true }); }
+// fim do jogo: fecha a última fase e mostra o ranking de cada fase feita nesta partida
+// (o do jogo inteiro só aparece quando houver mais de uma fase)
 function showWin() {
   mode = 'won'; sfx.win();
-  let best = playT;
-  if (!testMode) try { const b = +localStorage.getItem('masmorra-best'); if (b > 0 && b < best) best = b; localStorage.setItem('masmorra-best', best); } catch (e) {}
-  $('winTime').textContent = fmt(playT); $('winBest').textContent = fmt(best); $('winCoins').textContent = coinCount;
+  finishPhase();
+  const cols = splits.map(s => ({ title: PHASES[s.i].name, k: s.i + 1, pos: s.pos }));
+  if (PHASES.length > 1 && splits[0].i === 0) cols.push({ title: 'Jogo inteiro', k: 'total', pos: testMode ? -1 : addRank('total', playT) });
+  $('winRanks').innerHTML = cols.map(c => {
+    const r = loadRank(c.k);
+    const rows = r.map((e, i) => `<li${i === c.pos ? ' class="me"' : ''}><span>${i + 1}º</span><b>${fmtR(e.t)}</b><i>${e.hero}</i></li>`).join('');
+    return `<div class="rank"><h3>${c.title}</h3><ol>${rows || '<li class="none">sem tempos ainda</li>'}</ol></div>`;
+  }).join('');
+  $('winTime').textContent = fmtR(playT); $('winCoins').textContent = coinCount;
+  $('winNote').hidden = !testMode;
   $('winScreen').hidden = false; $('againBtn').focus({ preventScroll: true });
 }
 

@@ -62,7 +62,7 @@ function updateExit() {
     for (let i = 0; i < 16; i++) addP(cx + rand(-2, 2), cy, rand(-.2, .2), rand(-4, -2), irand(18, 30), ['#ffffff', '#ffd23f']);
     fade = -.6; sfx.zap();
   }
-  if (exitT >= EXIT_END) { const nx = L.next; if (nx) enterBiome(nx); else showWin(); return; }
+  if (exitT >= EXIT_END) { const nx = nextBiome(biome); if (nx) enterBiome(nx); else showWin(); return; }
   const [tx, ty] = camTarget();
   cam.x += (tx - cam.x) * .08; cam.y += (ty - cam.y) * .08;
 }

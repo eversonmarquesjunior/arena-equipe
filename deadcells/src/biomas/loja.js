@@ -1,10 +1,11 @@
-// ===== Lojinha da Masmorra =====
-// sala fechada entre os biomas: o herói chega pela porta da Masmorra e gasta as moedas
+// ===== Lojinha da Fase 1 =====
+// sala fechada entre os biomas: o herói chega pela porta do Esgoto Tóxico e gasta as moedas
+// toda fase tem uma Lojinha; o tema dela acompanha o bioma de onde o herói vem (aqui, o esgoto)
 // tem o Baú de Poder (grátis) com um Pergaminho de Poder
 
 defBiome('loja', {
-  name: 'Lojinha da Masmorra', sub: 'chegue perto de um item e aperte E para comprar com suas moedas', shop: true, next: 'esgoto',
-  w: 47, h: 40, pal: PAL_DUNGEON, flame: FLAME, spores: SPORES_DUNGEON,
+  name: 'Lojinha', sub: 'chegue perto de um item e aperte E para comprar com suas moedas', shop: true,
+  w: 47, h: 40, pal: PAL_SEWER, flame: FLAME_RED, torchGlow: GLOW_R, barrel: 'metal', spores: SPORES_SEWER,
   start: { x: 4 * TS, y: 34 * TS },
   door: { x: 39 * TS, y: 30 * TS, w: 16, h: 32 },
 

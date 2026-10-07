@@ -12,7 +12,7 @@ const PAL_DUNGEON = {
 const SPORES_DUNGEON = ['#2c6a64', '#5fd1b8', '#2c6a64'];   // poeira flutuando no ar
 
 defBiome('masmorra', {
-  name: 'Masmorra', sub: 'escolha uma arma nos pedestais', next: 'loja',
+  name: 'Masmorra', sub: 'escolha uma arma nos pedestais',
   w: 470, h: 40, pal: PAL_DUNGEON, flame: FLAME, spores: SPORES_DUNGEON,
   start: { x: 6 * TS, y: 30 * TS },
   door: { x: 462 * TS, y: 14 * TS, w: 16, h: 32 },

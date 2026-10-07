@@ -45,19 +45,23 @@ function resetLevel() {
   pl.weapon = null; ghosts = []; scrollFx = null;
   loadBiome('masmorra');
 }
-// o herói passa pela porta e aparece no próximo bioma: Masmorra → Lojinha → Esgoto Tóxico
+// o herói passa pela porta e aparece no próximo bioma: a ordem vem de PHASES (fases.js)
 function enterBiome(b) {
+  const done = BIOMES[b].phase !== phase ? finishPhase() : null;   // passou para a próxima fase
   loadBiome(b); mode = 'play';
   const start = L.start;
   enemies = []; shots = []; arrows = []; frags = []; blasts = []; ghosts = []; scrollFx = null;
   coins = [];   // moedas que ficaram no chão se perdem
   Object.assign(pl, { x: start.x, y: start.y - pl.h, vx: 0, vy: 0, face: 1, atk: null, roll: 0, hurt: 0, drink: 0, inv: 0, atkBuf: 0, heavyBuf: 0 });
   pl.safe = { x: pl.x, y: pl.y };
-  snapCam(); fade = -.8; keys.clear(); bannerQ.length = 0;
+  snapCam(); fade = -.8; keys.clear(); bannerQ.length = 0; renderTimer();
   burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 26, ['#ffffff', '#ffd23f', CHARS[heroIdx].color], 2, 0, [12, 24]);
   sfx.teleport();
   if (testMode) banner('Teste: ' + L.name, 'moedas infinitas · Esc > Teste para trocar de bioma');
-  else banner(L.name, L.sub);
+  else if (done) {
+    banner(`${PHASES[done.i].name} concluída!`, `tempo: ${fmtR(done.t)}` + (done.pos >= 0 ? ` · ${done.pos + 1}º lugar no ranking` : ''));
+    banner(L.name, L.sub, true);
+  } else banner(L.name, L.sub);
 }
 // menu de teste: teleporta direto para o bioma escolhido, mantendo a arma atual
 function testGo(b) {
@@ -66,6 +70,7 @@ function testGo(b) {
   resetLevel(); resetPlayer();
   pl.weapon = w; if (w) pl.carry = WEAPONS[w].idle;
   testMode = true;
+  phase = BIOMES[b].phase; phaseT0 = playT; splits = [];   // o cronômetro da fase recomeça no bioma escolhido
   // com arma na mão, o portão da sala inicial já começa aberto
   BIOMES[b].gates.forEach(g => { if (g.start) { g.closed = false; g.lift = 1; } });
   renderHp(); renderCoins(); renderTest();
