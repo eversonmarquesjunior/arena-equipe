@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masmorra da Equipe</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Masmorra da <span>Equipe</span></h1>
+    <nav>
+      <a class="back" href="../arena.html">← Arena</a>
+      <button class="icon-btn" id="fs">Tela cheia</button>
+      <button class="icon-btn" id="snd" aria-pressed="true">Som: ligado</button>
+    </nav>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="view" width="960" height="540"></canvas>
+    <div class="hud" id="hud">
+      <div class="plate" id="plate">
+        <div class="prow"><b id="hName">Lucas</b><small id="hWeapon">sem arma</small></div>
+        <div class="hprow"><div class="php" id="hpBar"><i id="hpFill"></i></div><small id="hpNum">100/100</small></div>
+        <div class="pot" id="pot"></div>
+      </div>
+      <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><span class="theavy" id="tipHeavy"></span><span class="theavy" id="tipNote"></span><em><kbd>E</kbd> <span id="tipAct">pegar</span></em></div>
+      <div class="timer" id="timer">0m 00s</div>
+      <div class="testBadge" id="testBadge" hidden>Modo teste</div>
+      <div class="scrollPop" id="scrollPop" hidden>
+        <b>Pergaminho de Poder</b>
+        <span class="sline">Vida máxima +20% <i id="scrollHp"></i></span>
+        <span class="sline">Dano ×1,5 <i id="scrollDmg"></i></span>
+        <small>o poder é do herói: vale para qualquer arma</small>
+      </div>
+      <div class="coins" id="coins"><b></b><span id="coinN">0</span></div>
+      <div class="overlay" id="titleScreen">
+        <h2>Escolha seu <span>herói</span></h2>
+        <div class="picks" id="picks"></div>
+        <button id="startBtn">Jogar</button>
+        <p class="dim pickHint"><kbd>←</kbd><kbd>→</kbd> ou <kbd>1</kbd>–<kbd>5</kbd> escolhem · <kbd>Enter</kbd> começa<br><kbd>A</kbd><kbd>D</kbd> andar · <kbd>Espaço</kbd>/<kbd>W</kbd> pular (2x no ar) · <kbd>J</kbd>/clique atacar (no arco, o clique mira) · <kbd>K</kbd>/botão direito ataque carregado · <kbd>Shift</kbd> rolar (desvia de ataques) · <kbd>E</kbd> pegar / abrir baú · <kbd>Q</kbd> beber poção de cura · <kbd>S</kbd>+<kbd>Espaço</kbd> descer da madeira · <kbd>F</kbd> tela cheia · <kbd>Esc</kbd> pausa</p>
+      </div>
+      <div class="overlay" id="pauseScreen" hidden>
+        <h2>Pausado</h2>
+        <div class="row"><button id="resumeBtn">Continuar</button><button class="ghost" id="restartBtn">Recomeçar</button><button class="ghost" id="pauseHeroBtn">Trocar herói</button><button class="ghost test" id="testBtn">Teste</button></div>
+        <p class="dim"><kbd>Esc</kbd> volta ao jogo</p>
+      </div>
+      <div class="overlay" id="testScreen" hidden>
+        <h2>Ambiente de <span>teste</span></h2>
+        <p class="dim">Escolha para onde ir. Você leva a arma atual e tem moedas infinitas nas lojas.</p>
+        <p class="tlabel">Biomas</p>
+        <div class="row" id="testBiomes"></div>
+        <p class="tlabel">Lojas</p>
+        <div class="row" id="testShops"></div>
+        <div class="row"><button class="ghost" id="testBackBtn">Voltar</button></div>
+        <p class="dim"><kbd>Esc</kbd> volta ao menu</p>
+      </div>
+      <div class="overlay" id="deadScreen" hidden>
+        <h2>Você <span>caiu</span></h2>
+        <p class="dim">Os bugs venceram desta vez. Moedas perdidas: <b id="deadCoins">0</b></p>
+        <div class="row"><button id="retryBtn">Tentar de novo</button><button class="ghost" id="deadHeroBtn">Trocar herói</button></div>
+      </div>
+      <div class="overlay" id="winScreen" hidden>
+        <h2>Saída <span>encontrada!</span></h2>
+        <p class="stats">Tempo: <b id="winTime">0s</b> · Recorde: <b id="winBest">0s</b> · Moedas: <b id="winCoins">0</b></p>
+        <p class="dim">Você atravessou a masmorra, passou pela lojinha e saiu do Esgoto Tóxico! Em breve: mais biomas.</p>
+        <div class="row"><button id="againBtn">Jogar de novo</button><button class="ghost" id="winHeroBtn">Trocar herói</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- scripts comuns (não módulos): todos dividem o mesmo escopo global, então a ordem importa.
+     Cada arquivo só usa, ao carregar, o que veio antes; o jogo começa em interface.js, o último. -->
+<script src="../shared/herois.js"></script>
+<script src="src/jogo/sprites.js"></script>
+<script src="src/jogo/armas.js"></script>
+<script src="src/motor/tela.js"></script>
+<script src="src/motor/som.js"></script>
+<script src="src/motor/particulas.js"></script>
+<script src="src/motor/mapa.js"></script>
+<!-- biomas, na ordem do jogo (é a mesma ordem do menu de teste) -->
+<script src="src/biomas/masmorra.js"></script>
+<script src="src/biomas/loja.js"></script>
+<script src="src/biomas/esgoto.js"></script>
+<script src="src/jogo/estado.js"></script>
+<script src="src/jogo/heroi.js"></script>
+<script src="src/jogo/inimigos.js"></script>
+<script src="src/jogo/itens.js"></script>
+<script src="src/jogo/mundo.js"></script>
+<script src="src/loop.js"></script>
+<script src="src/desenho.js"></script>
+<script src="src/interface.js"></script>
+</body>
+</html>
