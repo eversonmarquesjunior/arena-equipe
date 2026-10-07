@@ -34,7 +34,12 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .hud{position:absolute;inset:0;pointer-events:none;line-height:1.2;font-family:var(--display)}
 .plate{position:absolute;left:2%;top:4%;width:min(34%,270px);background:rgba(5,12,16,.72);border:2px solid var(--line);padding:4px 10px 7px;font-size:clamp(11px,1.7vw,17px)}
 .prow{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.php{margin-top:4px;height:clamp(5px,1vw,9px);background:#3a1424;border:2px solid #000;position:relative}
+/* a barra cresce com a vida máxima: 100 de vida = 58% da largura, até 82% */
+.hprow{display:flex;align-items:center;gap:6px;margin-top:4px}
+.hprow small{font-family:var(--mono);font-size:.7em;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.php.grow{animation:hpGrow .9s steps(6)}
+@keyframes hpGrow{0%,100%{box-shadow:none}30%,70%{box-shadow:0 0 0 2px #a77bff,0 0 10px #a77bff}}
+.php{transition:width .8s steps(8);flex:none;height:clamp(5px,1vw,9px);background:#3a1424;border:2px solid #000;position:relative}
 .pot{margin-top:4px;font-family:var(--mono);font-size:.68em;color:#ffb3c1;display:flex;align-items:center;gap:6px}
 .pot b{display:inline-block;width:.7em;height:.95em;background:#ff4d6d;border:2px solid #000;border-top-width:4px;border-top-color:#c8a26b;border-radius:0 0 3px 3px}
 .pot.empty{color:var(--dim)}.pot.empty b{background:#3a1424}
@@ -71,6 +76,30 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .overlay .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .overlay button{font-family:var(--display);font-weight:700;font-size:clamp(16px,2.6vw,24px);background:var(--orange);color:#1a0d00;border:none;padding:.35em 1.1em;box-shadow:inset 0 -5px 0 #b45309,0 0 0 2px #000}
 .overlay button.ghost{background:var(--panel2);color:var(--ink);box-shadow:inset 0 -5px 0 #071016,0 0 0 2px var(--line)}
+.overlay button.test{background:#3b2a52;color:#e9dcff;box-shadow:inset 0 -5px 0 #241634,0 0 0 2px #8b6bc9}
+.overlay p.tlabel{font-family:var(--display);color:var(--teal);font-size:clamp(12px,1.8vw,18px);margin-top:.3em}
+.testBadge{position:absolute;left:50%;top:3%;transform:translateX(-50%);font-family:var(--display);font-weight:700;font-size:clamp(10px,1.5vw,15px);letter-spacing:.08em;text-transform:uppercase;color:#e9dcff;background:#3b2a52;border:2px solid #8b6bc9;padding:.1em .7em;box-shadow:2px 2px 0 #000;pointer-events:none}
+.testBadge[hidden]{display:none}
+/* Pergaminho de Poder: papel com as pontas de madeira, salta do baú e some sozinho */
+.scrollPop{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.25em;padding:.7em 1.6em .8em;background:#f3e2b3;color:#3a2412;border:3px solid #140a1f;box-shadow:inset 0 3px 0 #fff6d8,inset 0 -4px 0 #c9a96b,4px 4px 0 #000;font-family:var(--display);text-align:center;pointer-events:none;opacity:0}
+.scrollPop[hidden]{display:none}
+.scrollPop::before,.scrollPop::after{content:"";position:absolute;top:-8px;bottom:-8px;width:10px;background:#8c5a30;border:3px solid #140a1f}
+.scrollPop::before{left:-13px}.scrollPop::after{right:-13px}
+.scrollPop b{font-size:clamp(15px,2.6vw,26px);color:#5a2fa8}
+/* números em fonte comum (a de pixel deixava o 2 e o 5 parecidos com 8) */
+.scrollPop .sline{font-family:var(--mono);font-size:clamp(12px,1.8vw,18px);font-weight:700}
+.scrollPop .sline i{font-style:normal;font-size:.95em;color:#2f7a22;margin-left:.5em;background:#e6d39c;padding:0 .35em;border:1px solid #c9a96b}
+.scrollPop small{font-family:var(--mono);font-size:clamp(9px,1.1vw,12px);color:#6b4a2a}
+/* 8 s na tela: ~1 s de salto, fica parado até os 7,4 s e some */
+.scrollPop.show{animation:scrollJump 8s forwards}
+@keyframes scrollJump{
+  0%{opacity:0;transform:translate(-50%,10%) scale(.2,.05) rotate(-10deg)}
+  5%{opacity:1;transform:translate(-50%,-70%) scale(1.15,1.15) rotate(3deg)}
+  8%{transform:translate(-50%,-45%) scale(.95,1.02) rotate(-1deg)}
+  10%{transform:translate(-50%,-52%) scale(1.02,.98) rotate(0)}
+  12%,93%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-90%) scale(.9)}
+}
 kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line);padding:0 5px;font-size:.9em}
 .picks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(6px,1.2vw,14px);width:min(100%,900px)}
 .overlay button.pick{position:relative;display:flex;flex-direction:column;align-items:center;gap:.25em;padding:clamp(6px,1vw,12px) clamp(4px,.8vw,10px) clamp(8px,1.2vw,14px);background:var(--panel);color:var(--ink);border:3px solid var(--line);box-shadow:none;font-weight:400;font-size:inherit;transition:transform .12s,background .12s}
@@ -103,11 +132,18 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
     <div class="hud" id="hud">
       <div class="plate" id="plate">
         <div class="prow"><b id="hName">Lucas</b><small id="hWeapon">sem arma</small></div>
-        <div class="php"><i id="hpFill"></i></div>
+        <div class="hprow"><div class="php" id="hpBar"><i id="hpFill"></i></div><small id="hpNum">100/100</small></div>
         <div class="pot" id="pot"></div>
       </div>
       <div class="tip" id="tip" hidden><b id="tipName"></b><span id="tipDesc"></span><div class="tstats" id="tipStats"></div><span class="theavy" id="tipHeavy"></span><span class="theavy" id="tipNote"></span><em><kbd>E</kbd> <span id="tipAct">pegar</span></em></div>
       <div class="timer" id="timer">0m 00s</div>
+      <div class="testBadge" id="testBadge" hidden>Modo teste</div>
+      <div class="scrollPop" id="scrollPop" hidden>
+        <b>Pergaminho de Poder</b>
+        <span class="sline">Vida máxima +20% <i id="scrollHp"></i></span>
+        <span class="sline">Dano ×1,5 <i id="scrollDmg"></i></span>
+        <small>o poder é do herói: vale para qualquer arma</small>
+      </div>
       <div class="coins" id="coins"><b></b><span id="coinN">0</span></div>
       <div class="overlay" id="titleScreen">
         <h2>Escolha seu <span>herói</span></h2>
@@ -117,8 +153,18 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
       </div>
       <div class="overlay" id="pauseScreen" hidden>
         <h2>Pausado</h2>
-        <div class="row"><button id="resumeBtn">Continuar</button><button class="ghost" id="restartBtn">Recomeçar</button><button class="ghost" id="pauseHeroBtn">Trocar herói</button></div>
+        <div class="row"><button id="resumeBtn">Continuar</button><button class="ghost" id="restartBtn">Recomeçar</button><button class="ghost" id="pauseHeroBtn">Trocar herói</button><button class="ghost test" id="testBtn">Teste</button></div>
         <p class="dim"><kbd>Esc</kbd> volta ao jogo</p>
+      </div>
+      <div class="overlay" id="testScreen" hidden>
+        <h2>Ambiente de <span>teste</span></h2>
+        <p class="dim">Escolha para onde ir. Você leva a arma atual e tem moedas infinitas nas lojas.</p>
+        <p class="tlabel">Biomas</p>
+        <div class="row" id="testBiomes"></div>
+        <p class="tlabel">Lojas</p>
+        <div class="row" id="testShops"></div>
+        <div class="row"><button class="ghost" id="testBackBtn">Voltar</button></div>
+        <p class="dim"><kbd>Esc</kbd> volta ao menu</p>
       </div>
       <div class="overlay" id="deadScreen" hidden>
         <h2>Você <span>caiu</span></h2>
@@ -128,7 +174,7 @@ kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line)
       <div class="overlay" id="winScreen" hidden>
         <h2>Saída <span>encontrada!</span></h2>
         <p class="stats">Tempo: <b id="winTime">0s</b> · Recorde: <b id="winBest">0s</b> · Moedas: <b id="winCoins">0</b></p>
-        <p class="dim">Você atravessou a masmorra! Em breve: lojinha e sala de melhorias para gastar as moedas.</p>
+        <p class="dim">Você atravessou a masmorra, passou pela lojinha e saiu do Esgoto Tóxico! Em breve: mais biomas.</p>
         <div class="row"><button id="againBtn">Jogar de novo</button><button class="ghost" id="winHeroBtn">Trocar herói</button></div>
       </div>
     </div>
@@ -482,9 +528,9 @@ const WEAPONS = {
     name: 'Besta Explosiva', desc: 'Virotes explodem ao acertar um bug e soltam estilhaços em volta. Clique para mirar.', tint: '#ffb27a', idle: 30, run: 120,
     stats: [['Dano', 3], ['Velocidade', 1], ['Alcance', 3]],
     heavyName: 'Virote Pesado', heavyDesc: 'explosão bem maior, com o dobro de estilhaços.',
-    heavy: { ranged: true, bolt: true, wind: 46, act: 1, rec: 22, dmg: 26, kb: 3, stop: 6, shake: 3, speed: 8, explode: { r: 36, dmg: 16, frags: 12 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    heavy: { ranged: true, bolt: true, wind: 46, act: 1, rec: 22, dmg: 44, kb: 3.5, stop: 7, shake: 3, speed: 8, explode: { r: 38, dmg: 26, frags: 12 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     combo: [
-      { ranged: true, bolt: true, wind: 18, act: 1, rec: 18, dmg: 16, kb: 2, stop: 3, shake: 1, speed: 7, explode: { r: 24, dmg: 9, frags: 6 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+      { ranged: true, bolt: true, wind: 18, act: 1, rec: 18, dmg: 26, kb: 2.5, stop: 4, shake: 1, speed: 7, explode: { r: 26, dmg: 14, frags: 6 }, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     ],
   },
   arco: {
@@ -497,7 +543,32 @@ const WEAPONS = {
       { ranged: true, wind: 12, act: 1, rec: 10, dmg: 16, kb: 1.2, stop: 2, shake: 0, speed: 6, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     ],
   },
+  zarabatana: {
+    name: 'Zarabatana', desc: 'Dardos envenenam o bug por 3 segundos; envenenado, ele leva o dobro de dano. Clique para mirar.', tint: '#9dff6a', idle: 10, run: 120,
+    stats: [['Dano', 1], ['Velocidade', 3], ['Alcance', 3]],
+    heavyName: 'Rajada Tripla', heavyDesc: 'sopra 3 dardos seguidos, todos com dano crítico.',
+    // dart: dardo leve (cai pouco); poison: quadros de veneno; burst: [quantos dardos, quadros entre eles]
+    heavy: { ranged: true, dart: true, wind: 36, act: 13, rec: 14, dmg: 8, kb: .8, stop: 2, shake: 1, speed: 7, poison: 180, alwaysCrit: true, burst: [3, 6], arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    combo: [
+      { ranged: true, dart: true, wind: 9, act: 1, rec: 10, dmg: 8, kb: .6, stop: 1, shake: 0, speed: 7, poison: 180, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    ],
+  },
+  katana: {
+    name: 'Katana Ninja', desc: 'Cada golpe é um avanço relâmpago que atravessa os bugs e corta todos no caminho.', tint: '#c8f8ff', idle: 45, run: 150,
+    note: 'Corta o escudo do Link Quebrado: acerta até de frente.', breaksShield: true,
+    stats: [['Dano', 2], ['Velocidade', 3], ['Alcance', 2]],
+    heavyName: 'Chuva de Adagas', heavyDesc: 'golpeia o chão e lança 5 adagas para frente.',
+    heavy: { wind: 30, act: 6, rec: 22, dmg: 22, reach: 24, up: 6, kb: 4, step: 0, stop: 7, shake: 6, arc: [-150, 80], pw: 'windup', pa: 'attack', pr: 'slam', slam: true, daggers: 5 },
+    // dash: velocidade do avanço durante o golpe (o herói passa pelos bugs sem levar dano)
+    combo: [
+      { wind: 4, act: 7, rec: 12, dmg: 11, reach: 14, up: 4, kb: 1.4, step: 0, stop: 2, shake: 1, arc: [-20, 10], dash: 5.5, both: true, pw: 'windup', pa: 'attack', pr: 'attack' },
+      { wind: 4, act: 7, rec: 12, dmg: 11, reach: 14, up: 4, kb: 1.4, step: 0, stop: 2, shake: 1, arc: [20, -10], dash: 5.5, both: true, pw: 'slam', pa: 'attack', pr: 'windup' },
+      { wind: 7, act: 8, rec: 18, dmg: 20, reach: 16, up: 6, kb: 3.4, step: 0, stop: 4, shake: 3, arc: [-30, 15], dash: 6.5, both: true, pw: 'windup', pa: 'attack', pr: 'slam' },
+    ],
+  },
 };
+// adaga da Chuva de Adagas (voa como flecha)
+const DAGGER_S = { ranged: true, dagger: true, dmg: 14, kb: 2, stop: 2, shake: 1, speed: 6.5 };
 
 const W = 320, H = 180, TS = 8;
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -551,7 +622,7 @@ function spriteSil(ci, pose, col = '#fff6d8') {
 }
 
 // ---------- mapa (tudo começa sólido e as salas são "escavadas")
-const MW = 470, MH = 40;
+const MW = 640, MH = 40;
 const AIR = 0, SOLID = 1, PLAT = 2;
 const map = Array.from({ length: MH }, () => new Uint8Array(MW).fill(SOLID));
 function fillT(x0, y0, x1, y1, v) {
@@ -611,9 +682,45 @@ carve(453, 10, 466, 17);
 // salas secretas (escondidas atrás de paredes falsas, ver SECRETS)
 carve(112, 26, 129, 33); carve(130, 30, 130, 33);
 carve(286, 4, 299, 9); carve(300, 6, 300, 9); plat(301, 10, 3);
+// lojinha: sala fechada separada do resto, o herói chega nela pela porta da Masmorra
+carve(478, 20, 521, 33);
+plat(483, 28, 4); plat(513, 28, 4);
+// Esgoto Tóxico (bioma 2, pequeno por enquanto): começa depois da lojinha
+const SEWER_X0 = 525;
+carve(527, 20, 545, 33);                          // sala de chegada
+plat(533, 29, 4); plat(539, 25, 4);
+carve(546, 24, 575, 33);                          // túnel com poça tóxica
+carve(553, 34, 557, MH - 1);
+carve(576, 14, 605, 33);                          // sala da emboscada
+plat(581, 29, 5); plat(595, 29, 5); plat(588, 24, 5); plat(580, 20, 4); plat(597, 20, 4);
+carve(606, 24, 620, 33);                          // túnel com outra poça
+carve(611, 34, 614, MH - 1);
+carve(621, 18, 636, 33);                          // sala da saída
+plat(624, 29, 4);
 
 const START = { x: 6 * TS, y: 30 * TS };
 const DOOR = { x: 462 * TS, y: 14 * TS, w: 16, h: 32 };
+const SHOP_START = { x: 481 * TS, y: 34 * TS };
+const SHOP_DOOR = { x: 516 * TS, y: 30 * TS, w: 16, h: 32 };
+const SHOP_X0 = 478;   // daqui para a direita é a lojinha
+// itens à venda: [coluna, tipo, arma, preço]
+const SHOP_ITEMS = [[491, 'potion', null, 20], [497, 'weapon', 'zarabatana', 60], [503, 'weapon', 'katana', 75]];
+const SEWER_START = { x: 530 * TS, y: 34 * TS };
+const SEWER_DOOR = { x: 631 * TS, y: 30 * TS, w: 16, h: 32 };
+// poças tóxicas: cair nelas machuca e devolve o herói ao último chão firme (y = linha da superfície)
+const POOLS = [{ x0: 553, x1: 557, y: 35 }, { x0: 611, x1: 614, y: 35 }];
+// canos redondos na parede do fundo do esgoto, pingando gosma
+const PIPES = [[536, 22], [562, 27], [590, 17], [628, 21]];
+// biomas, na ordem do jogo: onde o herói começa, a porta de saída, para onde ela leva (next)
+// e as colunas que a câmera pode mostrar; shop = é uma loja (aparece separado no menu de teste)
+const BIOMES = {
+  masmorra: { name: 'Masmorra', sub: 'escolha uma arma nos pedestais', start: START, door: DOOR, next: 'loja', x0: 0, x1: 470 },
+  loja: { name: 'Lojinha da Masmorra', sub: 'chegue perto de um item e aperte E para comprar com suas moedas', shop: true, start: SHOP_START, door: SHOP_DOOR, next: 'esgoto', x0: SHOP_X0 - 1, x1: SEWER_X0 - 1 },
+  esgoto: { name: 'Esgoto Tóxico', sub: 'cuidado com as poças verdes: a gosma machuca', start: SEWER_START, door: SEWER_DOOR, next: null, x0: SEWER_X0 + 1, x1: MW - 2 },
+};
+let biome = 'masmorra';
+let testMode = false;   // ambiente de teste (Esc > Teste): moedas infinitas e teleporte para qualquer bioma
+const curDoor = () => BIOMES[biome].door;
 // salas secretas: a passagem é uma parede falsa (dá para atravessar) e a sala só aparece quando o herói entra
 // wall: [coluna, linha inicial, linha final] da parede falsa (onde aparece o "?" de dica)
 const SECRETS = [
@@ -622,16 +729,35 @@ const SECRETS = [
 ];
 const inSecret = (x, y) => SECRETS.some(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
 // baús: escolha entre a arma nova e uma poção
-const CHESTS = [{ tx: 116, row: 34, wid: 'lanca' }, { tx: 291, row: 10, wid: 'besta' }];
+// power: Baú de Poder (fica na plataforma da esquerda da lojinha e guarda um Pergaminho de Poder)
+const CHESTS = [{ tx: 116, row: 34, wid: 'lanca' }, { tx: 291, row: 10, wid: 'besta' }, { tx: 510, row: 34, power: true }];
+// Pergaminho de Poder: melhora o herói (não a arma), então vale para qualquer arma até o fim da partida
+const SCROLL_HP = 1.2, SCROLL_DMG = 1.5;
 const TORCHES = [[8, 25], [28, 25], [40, 25], [58, 25], [66, 24], [101, 24], [70, 11], [99, 9], [112, 10], [124, 10], [145, 29], [160, 24], [176, 29], [186, 24], [199, 17], [212, 16], [226, 16], [233, 16],
-  [248, 18], [256, 18], [266, 16], [280, 15], [296, 16], [303, 20], [326, 14], [318, 4], [340, 4], [354, 4], [368, 8], [380, 8], [392, 8], [406, 14], [413, 14], [424, 12], [449, 12], [456, 13], [465, 13]];
-const WINDOWS = [[33, 18], [67, 15], [96, 23], [152, 22], [171, 22], [216, 9], [228, 9], [276, 14], [292, 14], [322, 12], [372, 6], [388, 6], [428, 7]];
-const BARRELS = [[36, 29], [37, 29], [60, 29], [99, 29], [173, 33], [174, 33], [231, 21], [296, 25], [297, 25], [358, 7], [398, 17], [114, 33], [128, 33], [297, 9], [454, 17]];
-const CHAINS = [[20, 14, 5], [80, 6, 12], [118, 8, 3], [161, 20, 5], [190, 10, 8], [220, 6, 6], [279, 12, 6], [309, 2, 8], [376, 2, 5], [395, 2, 4], [433, 6, 4], [440, 6, 3], [121, 26, 3], [293, 4, 2]];
+  [248, 18], [256, 18], [266, 16], [280, 15], [296, 16], [303, 20], [326, 14], [318, 4], [340, 4], [354, 4], [368, 8], [380, 8], [392, 8], [406, 14], [413, 14], [424, 12], [449, 12], [456, 13], [465, 13],
+  [480, 29], [488, 28], [494, 28], [500, 28], [507, 28], [513, 28], [520, 29],
+  [530, 26], [543, 26], [549, 28], [570, 28], [579, 23], [602, 23], [609, 28], [623, 26], [634, 26]];
+const WINDOWS = [[33, 18], [67, 15], [96, 23], [152, 22], [171, 22], [216, 9], [228, 9], [276, 14], [292, 14], [322, 12], [372, 6], [388, 6], [428, 7], [484, 21], [513, 21]];
+const BARRELS = [[36, 29], [37, 29], [60, 29], [99, 29], [173, 33], [174, 33], [231, 21], [296, 25], [297, 25], [358, 7], [398, 17], [114, 33], [128, 33], [297, 9], [454, 17], [479, 33], [486, 33], [487, 33],
+  [528, 33], [544, 33], [577, 33], [578, 33], [604, 33], [635, 33]];
+const CHAINS = [[20, 14, 5], [80, 6, 12], [118, 8, 3], [161, 20, 5], [190, 10, 8], [220, 6, 6], [279, 12, 6], [309, 2, 8], [376, 2, 5], [395, 2, 4], [433, 6, 4], [440, 6, 3], [121, 26, 3], [293, 4, 2], [491, 20, 2], [503, 20, 2], [584, 14, 4], [601, 14, 3], [540, 20, 2]];
 
 // ---------- desenho do mapa (pré-renderizado uma vez)
 const lvl = document.createElement('canvas'); lvl.width = MW * TS; lvl.height = MH * TS;
 const lvlS = document.createElement('canvas'); lvlS.width = MW * TS; lvlS.height = MH * TS;
+// cores do mapa: masmorra (azul-petróleo escuro) e Esgoto Tóxico (verde musgo claro)
+const PAL_DUNGEON = {
+  bg: '#0e2129', bgPatch: '#0c1c23', bgMortar: '#09171d', bgSpeck: '#14303a',
+  d4: '#061014', d3: '#09181e', d3Speck: '#0c1f26', d2: '#0f272f', d2Mortar: '#0a1c22',
+  wall: '#1a404c', wallMortar: '#102a32', wallSpeck: '#265a66', top: '#4aa383', top2: '#2f7562',
+  under: '#0a1a20', drip: '#102a32', lit: '#2a6270', shade: '#0d232a',
+};
+const PAL_SEWER = {
+  bg: '#3b5430', bgPatch: '#35502c', bgMortar: '#2e4426', bgSpeck: '#4a6a3a', slime: '#6fae3e',
+  d4: '#1b2915', d3: '#22331a', d3Speck: '#2a3e20', d2: '#2d4223', d2Mortar: '#26381e',
+  wall: '#5c7a43', wallMortar: '#486233', wallSpeck: '#77985a', top: '#c2e88a', top2: '#8fbf55',
+  under: '#2a3a20', drip: '#6fae3e', lit: '#7f9f5f', shade: '#33462a',
+};
 // view(x, y): que bloco desenhar; hide: esconde a decoração que fica dentro das salas secretas
 function buildLevel(cv, view, hide) {
   const b = cv.getContext('2d');
@@ -648,11 +774,13 @@ function buildLevel(cv, view, hide) {
     const o = (ty % 2) * 4; r(X + o, Y + 1, 1, 3, mortar); r(X + (o + 4) % 8, Y + 5, 1, 3, mortar);
   };
   for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
-    const t = view(x, y), X = x * TS, Y = y * TS;
+    const t = view(x, y), X = x * TS, Y = y * TS, C = x >= SEWER_X0 ? PAL_SEWER : PAL_DUNGEON;
     if (t !== SOLID) {
       const patch = ((x >> 2) * 7 + (y >> 2) * 13) % 5 === 0;
-      bricks(X, Y, y, patch ? '#0c1c23' : '#0e2129', '#09171d');
-      if (rnd() < .3) r(X + irand(1, 6), Y + irand(1, 6), 1, 1, '#14303a');
+      bricks(X, Y, y, patch ? C.bgPatch : C.bg, C.bgMortar);
+      if (rnd() < .3) r(X + irand(1, 6), Y + irand(1, 6), 1, 1, C.bgSpeck);
+      // esgoto: manchas de limo escorrendo pelas paredes do fundo
+      if (C.slime && rnd() < .04) { const h = irand(2, 7); r(X + irand(1, 6), Y, 1, h, C.slime); }
       if (t === PLAT) {
         r(X, Y, TS, 1, '#c28a52'); r(X, Y + 1, TS, 2, '#80552f'); r(X, Y + 3, TS, 1, '#4a2f1c');
         if (x % 2 === 0) r(X + 1, Y + 1, 1, 1, '#2b1a10');
@@ -662,19 +790,29 @@ function buildLevel(cv, view, hide) {
       continue;
     }
     const d = depth(x, y);
-    if (d >= 4) { r(X, Y, TS, TS, '#061014'); continue; }
-    if (d === 3) { r(X, Y, TS, TS, '#09181e'); if (rnd() < .2) r(X + irand(0, 6), Y + irand(0, 6), 2, 1, '#0c1f26'); continue; }
-    if (d === 2) { bricks(X, Y, y, '#0f272f', '#0a1c22'); continue; }
-    bricks(X, Y, y, '#1a404c', '#102a32');
-    if (rnd() < .5) r(X + irand(1, 6), Y + irand(1, 6), 1, 1, '#265a66');
+    if (d >= 4) { r(X, Y, TS, TS, C.d4); continue; }
+    if (d === 3) { r(X, Y, TS, TS, C.d3); if (rnd() < .2) r(X + irand(0, 6), Y + irand(0, 6), 2, 1, C.d3Speck); continue; }
+    if (d === 2) { bricks(X, Y, y, C.d2, C.d2Mortar); continue; }
+    bricks(X, Y, y, C.wall, C.wallMortar);
+    if (rnd() < .5) r(X + irand(1, 6), Y + irand(1, 6), 1, 1, C.wallSpeck);
     if (open(x, y - 1)) {
-      r(X, Y, TS, 1, '#4aa383'); r(X, Y + 1, TS, 1, '#2f7562');
-      for (let i = 0; i < TS; i++) if (rnd() < .3) r(X + i, Y + 2, 1, irand(1, 2), '#2f7562');
+      r(X, Y, TS, 1, C.top); r(X, Y + 1, TS, 1, C.top2);
+      for (let i = 0; i < TS; i++) if (rnd() < .3) r(X + i, Y + 2, 1, irand(1, 2), C.top2);
     }
-    if (open(x, y + 1)) { r(X, Y + 7, TS, 1, '#0a1a20'); if (rnd() < .4) r(X + irand(0, 7), Y + 8, 1, irand(1, 3), '#102a32'); }
-    if (open(x - 1, y)) r(X, Y, 1, TS, '#2a6270');
-    if (open(x + 1, y)) r(X + 7, Y, 1, TS, '#0d232a');
+    if (open(x, y + 1)) { r(X, Y + 7, TS, 1, C.under); if (rnd() < .4) r(X + irand(0, 7), Y + 8, 1, irand(1, 3), C.drip); }
+    if (open(x - 1, y)) r(X, Y, 1, TS, C.lit);
+    if (open(x + 1, y)) r(X + 7, Y, 1, TS, C.shade);
   }
+  // canos redondos do esgoto: aro de pedra, boca escura e gosma escorrendo da borda de baixo
+  PIPES.forEach(([px, py]) => {
+    const X = px * TS + 4, Y = py * TS + 4;
+    for (let y = -13; y <= 13; y++) for (let x = -13; x <= 13; x++) {
+      const d = Math.hypot(x, y);
+      if (d > 13) continue;
+      r(X + x, Y + y, 1, 1, d > 11 ? '#2c3a22' : d > 9 ? ((Math.atan2(y, x) * 4 / Math.PI + 8) | 0) % 2 ? '#7d8f62' : '#93a676' : y > 4 ? '#5fd13a' : '#141d10');
+    }
+    for (let i = 0; i < 4; i++) { const sx = X - 6 + i * 4, h = irand(3, 9); r(sx, Y + 9, 2, h, '#5fd13a'); r(sx, Y + 9 + h, 2, 1, '#b5ff7a'); }
+  });
   // janelas em arco com grades
   WINDOWS.forEach(([wx, wy]) => {
     const X = wx * TS, Y = wy * TS;
@@ -701,15 +839,33 @@ function buildLevel(cv, view, hide) {
   BARRELS.forEach(([bx, by]) => {
     if (!shown(bx, by)) return;
     const X = bx * TS, Y = (by + 1) * TS - 10;
+    if (bx >= SEWER_X0) {
+      // esgoto: barril de metal enferrujado vazando gosma
+      r(X + 1, Y, 6, 10, '#4f5a3c'); r(X, Y + 2, 8, 6, '#4f5a3c');
+      r(X + 2, Y + 1, 1, 8, '#6f7d55'); r(X + 6, Y + 1, 1, 8, '#343d27');
+      r(X, Y + 2, 8, 1, '#8a6a2a'); r(X, Y + 7, 8, 1, '#8a6a2a'); r(X + 1, Y, 6, 1, '#5fd13a');
+      r(X + 3, Y + 4, 2, 2, '#ffd23f'); r(X + 2, Y + 1, 1, 3, '#5fd13a');
+      return;
+    }
     r(X + 1, Y, 6, 10, '#6a4428'); r(X, Y + 2, 8, 6, '#6a4428');
     r(X + 2, Y + 1, 1, 8, '#8c5e38'); r(X + 6, Y + 1, 1, 8, '#4a2e1a');
     r(X, Y + 2, 8, 1, '#2e3238'); r(X, Y + 7, 8, 1, '#2e3238'); r(X + 1, Y, 6, 1, '#4a2e1a');
   });
-  // porta de saída
-  const { x: DX, y: DY } = DOOR;
-  r(DX - 3, DY - 4, 22, 36, '#2c6470'); r(DX - 2, DY - 3, 20, 35, '#1a404c');
-  r(DX, DY, 16, 32, '#03070a'); r(DX - 4, DY + 30, 24, 2, '#4aa383');
-  r(DX + 7, DY - 3, 2, 2, '#f5801e');
+  // portas de saída (Masmorra, lojinha e esgoto)
+  [DOOR, SHOP_DOOR, SEWER_DOOR].forEach(({ x: DX, y: DY }) => {
+    r(DX - 3, DY - 4, 22, 36, '#2c6470'); r(DX - 2, DY - 3, 20, 35, '#1a404c');
+    r(DX, DY, 16, 32, '#03070a'); r(DX - 4, DY + 30, 24, 2, '#4aa383');
+    r(DX + 7, DY - 3, 2, 2, '#f5801e');
+  });
+  // lojinha: tapete vermelho no chão e uma faixa com moedas na parede do fundo
+  const fy = SHOP_START.y;
+  r(489 * TS, fy - 1, 16 * TS, 1, '#7a1f2e'); r(489 * TS, fy - 2, 16 * TS, 1, '#c8203f');
+  for (let x = 489 * TS + 2; x < 505 * TS; x += 6) r(x, fy - 2, 2, 1, '#ffd23f');
+  r(490 * TS, 22 * TS, 14 * TS, 12, '#5a1622'); r(490 * TS, 22 * TS, 14 * TS, 1, '#d9a640'); r(490 * TS, 22 * TS + 11, 14 * TS, 1, '#d9a640');
+  for (let i = 0; i < 6; i++) {
+    const X = 492 * TS + i * 18, Y = 22 * TS + 3;
+    r(X, Y, 6, 6, '#5a3f0a'); r(X + 1, Y + 1, 4, 4, '#ffd23f'); r(X + 1, Y + 1, 1, 1, '#fff6c2');
+  }
 }
 buildLevel(lvl, (x, y) => inSecret(x, y) ? SOLID : map[y][x], true);
 buildLevel(lvlS, (x, y) => map[y][x], false);
@@ -720,11 +876,12 @@ const GATES = [
   { tx: 44, y0: 22, y1: 29 },
   { tx: 207, y0: 10, y1: 21 }, { tx: 241, y0: 16, y1: 21 },
   { tx: 360, y0: 2, y1: 7 }, { tx: 401, y0: 12, y1: 17 },
+  { tx: 575, y0: 24, y1: 33 }, { tx: 606, y0: 24, y1: 33 },   // emboscada do esgoto
 ];
 function setGate(g, closed) { g.closed = closed; for (let y = g.y0; y <= g.y1; y++) map[y][g.tx] = closed ? SOLID : AIR; }
 const PEDESTALS = [[12, 30, 'espada'], [22, 30, 'martelo'], [32, 30, 'arco']];
 // encontros: quando o herói passa da coluna "at", os inimigos da lista surgem ([tipo, coluna, linha do chão])
-// primeira fase: fora das emboscadas os bugs vêm quase sempre sozinhos, para o jogador aprender cada tipo com calma
+// primeiro bioma: fora das emboscadas os bugs vêm quase sempre sozinhos, para o jogador aprender cada tipo com calma
 const ENCOUNTERS = [
   { at: 47, list: [['bug', 58, 30]] },
   { at: 64, list: [['shooter', 99, 30]] },
@@ -737,6 +894,11 @@ const ENCOUNTERS = [
   { at: 333, list: [['shield', 345, 8]] },
   { at: 422, list: [['flyer', 436, 9]] },
   { at: 448, list: [['bug', 456, 18]] },
+  // Esgoto Tóxico (lv = em qual trecho do mapa o encontro fica)
+  { lv: 'esgoto', at: 534, list: [['bug', 544, 34]] },
+  { lv: 'esgoto', at: 548, list: [['shield', 568, 34], ['flyer', 564, 27]] },
+  { lv: 'esgoto', at: 608, list: [['shield', 619, 34]] },
+  { lv: 'esgoto', at: 621, list: [['shooter', 633, 34], ['ghost', 626, 34]] },
 ];
 // salas de emboscada: ao entrar, os portões fecham e vêm ondas de inimigos
 const AMBUSHES = [
@@ -749,6 +911,10 @@ const AMBUSHES = [
     [['ghost', 376, 18], ['shooter', 397, 18], ['flyer', 386, 8]],
     [['shield', 368, 18], ['shield', 394, 18], ['flyer', 380, 6], ['shooter', 389, 18]],
   ] },
+  { lv: 'esgoto', at: 580, gates: [5, 6], waves: [
+    [['bug', 586, 34], ['shield', 598, 34], ['bug', 592, 34]],
+    [['ghost', 590, 34], ['shooter', 600, 34], ['flyer', 588, 18], ['flyer', 596, 18]],
+  ] },
 ];
 
 // ---------- brilho suave (porta e armas nos pedestais)
@@ -759,6 +925,8 @@ function radial(r, stops) {
   x.fillStyle = g; x.fillRect(0, 0, r * 2, r * 2); return c;
 }
 const GLOW_O = radial(64, [[0, 'rgba(255,170,80,.6)'], [.45, 'rgba(245,128,30,.2)'], [1, 'rgba(245,128,30,0)']]);
+const GLOW_G = radial(64, [[0, 'rgba(160,255,90,.55)'], [.5, 'rgba(95,209,58,.18)'], [1, 'rgba(95,209,58,0)']]);
+const GLOW_R = radial(64, [[0, 'rgba(255,110,100,.6)'], [.5, 'rgba(255,60,60,.18)'], [1, 'rgba(255,60,60,0)']]);
 
 // ---------- som
 let AC = null, soundOn = true;
@@ -810,9 +978,16 @@ const sfx = {
   thunk() { noise(.06, .08, 1200); tone(240, .05, 'square', .025, -100); },
   coin(i = 0) { tone(1320 + (i % 4) * 110, .05, 'square', .025); tone(1760 + (i % 4) * 110, .07, 'square', .02, 0, .04); },
   chest() { noise(.2, .08, 800); [392, 523, 659, 784].forEach((f, i) => tone(f, .12, 'triangle', .045, 0, .1 + i * .07)); },
+  power() { [392, 494, 587, 784, 988].forEach((f, i) => tone(f, .2, 'triangle', .05, 0, i * .08)); tone(196, .6, 'sawtooth', .03, 400); noise(.4, .08, 5000, .1); },
   secret() { [659, 784, 988, 1318].forEach((f, i) => tone(f, .16, 'triangle', .045, 0, i * .09)); },
   boom(k = 1) { noise(.35 * k + .1, .2 * k, 1400); tone(110, .25, 'triangle', .1 * k, -60); },
   crit() { tone(1600, .06, 'square', .05); tone(2200, .1, 'square', .04, 0, .05); noise(.08, .1, 6000); },
+  splash() { noise(.3, .12, 900); tone(160, .25, 'sine', .05, -90); tone(420, .12, 'sine', .03, 300, .08); },
+  puff() { noise(.07, .07, 3200); tone(880, .05, 'sine', .025, -300); },
+  poison() { tone(300, .12, 'sine', .035, 180); tone(420, .1, 'sine', .025, 160, .06); },
+  dash() { noise(.12, .09, 7000); tone(1100, .08, 'triangle', .025, -700); },
+  knives() { [0, .03, .06, .09, .12].forEach(d => noise(.06, .06, 6500, d)); tone(1700, .06, 'square', .02); },
+  buy() { tone(1320, .05, 'square', .035); tone(1760, .05, 'square', .035, 0, .05); [523, 659, 784, 1046].forEach((f, i) => tone(f, .1, 'triangle', .045, 0, .1 + i * .06)); },
   crank() { tone(240, .05, 'square', .03); tone(200, .05, 'square', .03, 0, .07); },
   spawn() { tone(200, .15, 'square', .03, 600); noise(.1, .05, 3000); },
   clink() { tone(1500, .05, 'square', .05); tone(1100, .08, 'triangle', .04, 0, .03); },
@@ -832,6 +1007,9 @@ let parts = [];
 const DUST = ['#a9c2bd', '#6b8a88', '#3e5a5c'];
 const SMOKE = ['#d9d2e6', '#9d93b0', '#6a6079', '#4b435a'];
 const FLAME = ['#e9fff2', '#9dffc8', '#3fe08f', '#1c9a58'];
+const POISON = ['#e9ffe0', '#9dff6a', '#4fb83a', '#2a6b1f'];
+const FLAME_RED = ['#fff0e0', '#ff9a8a', '#ff4d4d', '#a01f2a'];   // tochas do esgoto
+const flameOf = tx => tx >= SEWER_X0 ? FLAME_RED : FLAME;
 function addP(x, y, vx, vy, life, col, g = 0, size = 1) { parts.push({ x, y, vx, vy, life, max: life, col, g, size }); }
 function burst(x, y, n, cols, sp = 1.5, g = 0, life = [10, 22], size = 1) {
   for (let i = 0; i < n; i++) { const a = rand(0, Math.PI * 2), v = rand(.3, 1) * sp; addP(x, y, Math.cos(a) * v, Math.sin(a) * v, irand(life[0], life[1]), cols, g, size); }
@@ -845,9 +1023,9 @@ const GRAV = .32, MAXFALL = 6;   // inimigos e moedas
 const P_GRAV = .24, JUMP = 4.2, JUMP2 = 3.7, P_MAXFALL = 5.2;
 const COYOTE = 6, BUFFER = 7, ROLL_T = 20, ROLL_SPD = 3.4, ROLL_CD = 28;
 const pl = { x: 0, y: 0, w: 10, h: 28, vx: 0, vy: 0, face: 1, ground: false, coyote: 0, buf: 0, jumps: 0, cut: false, roll: 0, rollCd: 0, drop: 0, anim: 0, land: 0, safe: null,
-  hp: 100, max: 100, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
+  hp: 100, max: 100, dmgMul: 1, scrolls: 0, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
 let heroIdx = 0, T = 0, mode = 'title', playT = 0, fade = 0, exitT = 0, deadT = 0, hitstop = 0, shake = 0, hurtFx = 0;
-let enemies = [], items = [], nums = [], arrows = [], coins = [], frags = [], blasts = [], chests = [];
+let enemies = [], items = [], nums = [], arrows = [], coins = [], frags = [], blasts = [], chests = [], ghosts = [];   // ghosts: rastro do avanço da katana
 let coinCount = 0;
 let aimPt = null, mouseScr = null;   // aimPt: ponto do mapa clicado para atacar; mouseScr: mouse na tela (para desenhar a mira)
 // teletransporte na porta: brilha, estica num raio de luz e some
@@ -985,7 +1163,18 @@ function updatePlayer() {
     Object.assign(pl, { x: pl.safe.x, y: pl.safe.y, vx: 0, vy: 0, roll: 0 });
     snapCam();
   }
-  if (pl.x + pl.w > DOOR.x + 4 && pl.x < DOOR.x + DOOR.w - 4 && pl.y + pl.h > DOOR.y && pl.y < DOOR.y + DOOR.h) win();
+  // gosma tóxica: espirra, machuca e devolve o herói ao último chão firme
+  const pool = poolAt(pl);
+  if (pool) {
+    splash(pl.x + pl.w / 2, pool.y * TS);
+    Object.assign(pl, { x: pl.safe.x, y: pl.safe.y, vx: 0, vy: 0, roll: 0, atk: null });
+    snapCam(); fade = .7;
+    hurtPlayer(TOXIC_DMG, pl.face);
+    pl.vx = 0; pl.vy = 0;   // sem o empurrão do dano: o herói volta parado no chão firme
+    if (mode !== 'play') return;
+  }
+  const D = curDoor();
+  if (pl.x + pl.w > D.x + 4 && pl.x < D.x + D.w - 4 && pl.y + pl.h > D.y && pl.y < D.y + D.h) win();
 }
 
 function roll() {
@@ -1017,9 +1206,10 @@ function chargeFx(a) {
   if (a.f % 2 === 0) { const an = rand(0, Math.PI * 2), d = rand(12, 20); addP(cx + Math.cos(an) * d, cy + Math.sin(an) * d, -Math.cos(an) * d / 10, -Math.sin(an) * d / 10, 10, ['#ffffff', '#ffd23f', col]); }
   if (a.f === s.wind - 8) { burst(cx, cy, 12, ['#ffffff', '#ffd23f'], 1.6, 0, [8, 14]); sfx.ready(); }
 }
-function shootArrow(a) {
+function shootArrow(a, i = 0) {
   const s = a.s, r = a.aim * Math.PI / 180, ox = pl.x + pl.w / 2 + pl.face * 6, oy = pl.y + 12;
   arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * s.speed, vy: Math.sin(r) * s.speed, s, life: 90, stuck: 0, hit: new Set(), heavy: a.heavy });
+  if (s.dart) { sfx.puff(); burst(ox, oy, a.heavy ? 6 : 3, ['#ffffff', '#c8ffb0', '#9dff6a'], 1, 0, [5, 10]); if (a.heavy && i === 0) shake = Math.max(shake, 1); return; }
   if (a.heavy) { sfx.big(); burst(ox, oy, 10, ['#ffffff', '#ffd23f'], 1.6); shake = Math.max(shake, 2); }
   if (s.bolt) sfx.crank(); else sfx.twang();
 }
@@ -1038,13 +1228,15 @@ function updateArrows() {
       const e = enemies.find(o => targetable(o) && !ar.hit.has(o) && ar.x > o.x - 2 && ar.x < o.x + o.w + 2 && ar.y > o.y - 7 && ar.y < o.y + o.h + 2);
       if (e) {
         ar.hit.add(e);
-        const ok = hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1, ar.heavy);
+        const ok = hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1, ar.heavy, ar.s.alwaysCrit);
+        if (ok && ar.s.alwaysCrit) sfx.crit();
         if (ar.s.explode) explodeAt(ar.x, ar.y, ar.s.explode, e);   // explode mesmo se bateu no escudo
         if (!ok || !ar.s.pierce) { ar.life = 0; ar.gone = true; return; }   // bateu no escudo, ou flecha comum: some; a perfurante segue
       }
     }
-    ar.vy += .05;
-    if (ar.life > 0 && (ar.heavy || T % 2 === 0)) addP(ar.x - ar.vx * .6, ar.y - ar.vy * .6, 0, 0, ar.heavy ? 12 : 6, ar.heavy ? ['#ffffff', '#ffd23f', '#f5801e'] : ['#fff6d8', '#e6d2a0']);
+    ar.vy += ar.s.dart ? .02 : ar.s.dagger ? .03 : .05;
+    const trail = ar.s.dart ? ['#e9ffe0', '#9dff6a'] : ar.s.dagger ? ['#ffffff', '#c8f8ff'] : ar.heavy ? ['#ffffff', '#ffd23f', '#f5801e'] : ['#fff6d8', '#e6d2a0'];
+    if (ar.life > 0 && (ar.heavy || T % 2 === 0)) addP(ar.x - ar.vx * .6, ar.y - ar.vy * .6, 0, 0, ar.heavy ? 12 : 6, trail);
   });
   arrows = arrows.filter(ar => !ar.gone && (ar.life > 0 || ar.stuck > 0) && ar.y < MH * TS + 20);
 }
@@ -1089,10 +1281,20 @@ function updateAttack() {
   const s = a.s, len = WEAPONS[pl.weapon].combo.length, nextI = a.heavy ? 0 : (a.i + 1) % len;
   a.f++;
   if (a.heavy && a.f < s.wind) chargeFx(a);
-  if (s.ranged) { if (a.f === s.wind) shootArrow(a); }
-  else {
-    if (a.f === s.wind) { (s.slam ? sfx.heavy : sfx.swing)(); if (a.heavy) sfx.big(); if (pl.ground) pl.vx = pl.face * s.step; }
+  if (s.ranged) {
+    // burst: vários disparos seguidos (Rajada Tripla da zarabatana)
+    const k = a.f - s.wind, [n, gap] = s.burst || [1, 1];
+    if (k >= 0 && k % gap === 0 && k / gap < n) shootArrow(a, k / gap);
+  } else {
+    if (a.f === s.wind) { (s.slam ? sfx.heavy : s.dash ? sfx.dash : sfx.swing)(); if (a.heavy) sfx.big(); if (pl.ground) pl.vx = pl.face * s.step; if (s.dash) a.x0 = pl.x + pl.w / 2; }
+    // Katana: o golpe é um avanço rápido (para se bater num escudo de frente)
+    if (s.dash && !a.blocked && a.f >= s.wind && a.f < s.wind + s.act) {
+      const last = a.f === s.wind + s.act - 1;
+      pl.vx = pl.face * (last ? 1.2 : s.dash); pl.vy = Math.min(pl.vy, .3);
+      ghosts.push({ x: pl.x + pl.w / 2, y: pl.y + pl.h, face: pl.face, pose: heroPose(), life: 12 });
+    }
     if (a.f >= s.wind && a.f < s.wind + s.act) hitCheck(a);
+    if (s.daggers && a.f === s.wind + s.act - 1) throwDaggers(s.daggers);
   }
   if (s.slam && a.f === s.wind + s.act - 1 && pl.ground) {
     const gx = pl.x + pl.w / 2 + pl.face * (s.reach - 6);
@@ -1119,8 +1321,20 @@ function hitCheck(a) {
   // Lança de Guerra: 2 ou mais bugs no mesmo golpe = crítico (dano dobrado)
   const crit = a.s.crit && targets.length + a.hit.size >= 2;
   if (crit && targets.length && !a.critFx) { a.critFx = true; sfx.crit(); shake = Math.max(shake, 4); }
-  targets.forEach(e => { a.hit.add(e); hitEnemy(e, a.s, Math.sign(e.x + e.w / 2 - px) || pl.face, a.heavy, crit); });
+  targets.forEach(e => { a.hit.add(e); if (!hitEnemy(e, a.s, Math.sign(e.x + e.w / 2 - px) || pl.face, a.heavy, crit) && a.s.dash) a.blocked = true; });
 }
+// Chuva de Adagas: leque de adagas saindo da altura da cintura
+function throwDaggers(n) {
+  const ox = pl.x + pl.w / 2 + pl.face * 6, oy = pl.y + 15;
+  for (let i = 0; i < n; i++) {
+    const r = (-14 + i * 28 / (n - 1)) * Math.PI / 180;
+    arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * DAGGER_S.speed, vy: Math.sin(r) * DAGGER_S.speed, s: DAGGER_S, life: 70, stuck: 0, hit: new Set(), heavy: false });
+  }
+  burst(ox, oy, 10, ['#ffffff', '#c8f8ff', '#8a93a6'], 1.6, 0, [6, 12]);
+  sfx.knives();
+}
+// herói está esquivando? (rolando, ou no meio do avanço da katana)
+const dodging = () => pl.roll > 0 || !!(pl.atk && pl.atk.s.dash && !pl.atk.blocked && pl.atk.f >= pl.atk.s.wind && pl.atk.f < pl.atk.s.wind + pl.atk.s.act + 2);
 function addNum(v, x, y, col, big) { nums.push({ s: String(v), x: x + rand(-3, 3), y, col, t: 0, big }); }
 
 // ---------- poção de cura
@@ -1200,6 +1414,7 @@ const ledge = (e, dir) => tile(Math.floor((e.x + (dir > 0 ? e.w + 1 : -1)) / TS)
 function updateEnemy(e) {
   if (e.spawnT > 0) { e.spawnT--; if (T % 3 === 0) addP(e.x + rand(0, e.w), e.y + rand(0, e.h), 0, -.4, 10, [e.pal.hi, '#ffffff']); return; }
   e.t++;
+  if (e.poison > 0) { e.poison--; e.barT = Math.max(e.barT, 2); if (T % 5 === 0 && e.hidden <= 0) addP(e.x + rand(2, e.w - 2), e.y + rand(0, e.h / 2), rand(-.1, .1), rand(-.6, -.3), irand(14, 22), POISON); }
   if (e.flash > 0) e.flash--;
   if (e.barT > 0) e.barT--;
   if (e.cd > 0) e.cd--;
@@ -1246,7 +1461,7 @@ function updateEnemy(e) {
     if (e.ground && ledge(e, e.face) && !floorBelow(e, e.face)) e.vx = 0;
     if (e.ground && e.t > 3) e.vx *= .9;
     // rolando (ou ainda invencível) o bote passa direto: esquiva
-    if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (pl.roll <= 0 && pl.inv <= 0) hurtPlayer(k.dmg, e.face); }
+    if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (!dodging() && pl.inv <= 0) hurtPlayer(k.dmg, e.face); }
     if (e.t >= E_LUNGE) { e.st = 'rest'; e.t = 0; e.restLen = E_REST; }
   } else if (e.st === 'rest') {
     target = 0;
@@ -1265,6 +1480,14 @@ function updateEnemy(e) {
   if (e.ground) e.vy = 0;
   if (Math.abs(e.vx) > .2) e.anim += Math.abs(e.vx) * .25;
   if (e.y > MH * TS + 20) e.dead = true;
+  // bug que cai na gosma derrete (sem moedas)
+  const pool = poolAt(e);
+  if (pool && !e.dead) { e.dead = true; splash(e.x + e.w / 2, pool.y * TS); burst(e.x + e.w / 2, e.y + e.h / 2, 12, [e.pal.hi, e.pal.shell], 1.4, .05, [10, 20]); }
+}
+const TOXIC_DMG = 15;
+function splash(x, y) {
+  for (let i = 0; i < 18; i++) addP(x + rand(-4, 4), y, rand(-1.4, 1.4), rand(-3, -1), irand(14, 26), POISON, .15, 2);
+  sfx.splash();
 }
 
 // Arquivo Corrompido: cospe um bloco de dados na direção do herói
@@ -1280,7 +1503,7 @@ function updateShots() {
     if (T % 2 === 0) addP(b.x, b.y, 0, 0, 8, ['#fff176', '#ff4d6d', '#852a26']);
     if (tile(Math.floor(b.x / TS), Math.floor(b.y / TS)) === SOLID) { b.life = 0; burst(b.x, b.y, 6, ['#fff176', '#ff4d6d'], 1.2, .05, [6, 12]); }
     // rolando, o disparo atravessa o herói
-    else if (mode === 'play' && pl.roll <= 0 && pl.inv <= 0 && b.x > pl.x - 1 && b.x < pl.x + pl.w + 1 && b.y > pl.y && b.y < pl.y + pl.h) { b.life = 0; hurtPlayer(b.dmg, b.vx < 0 ? -1 : 1); }
+    else if (mode === 'play' && !dodging() && pl.inv <= 0 && b.x > pl.x - 1 && b.x < pl.x + pl.w + 1 && b.y > pl.y && b.y < pl.y + pl.h) { b.life = 0; hurtPlayer(b.dmg, b.vx < 0 ? -1 : 1); }
   });
   shots = shots.filter(b => b.life > 0);
 }
@@ -1342,7 +1565,7 @@ function updateFlyer(e) {
       e.st = 'dive'; e.t = 0; e.bit = false; sfx.bite();
     }
   } else if (e.st === 'dive') {
-    if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (pl.roll <= 0 && pl.inv <= 0) hurtPlayer(ETYPES.flyer.dmg, Math.sign(e.vx) || 1); }
+    if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (!dodging() && pl.inv <= 0) hurtPlayer(ETYPES.flyer.dmg, Math.sign(e.vx) || 1); }
     if (e.t >= 34) { e.st = 'rest'; e.t = 0; }
   } else if (e.st === 'rest') {
     e.vx *= .9; e.vy = e.vy * .9 - .04;
@@ -1366,12 +1589,18 @@ function hitEnemy(e, s, dir, heavy, crit) {
     if (!s.ranged) pl.vx = -dir * 1.8;
     return false;
   }
-  const dmg = Math.round(s.dmg * rand(.9, 1.1) * (crit ? 2 : 1));
+  // envenenado (zarabatana): qualquer golpe causa o dobro de dano
+  const pois = e.poison > 0;
+  const dmg = Math.round(s.dmg * pl.dmgMul * rand(.9, 1.1) * (crit ? 2 : 1) * (pois ? 2 : 1));   // dmgMul: Pergaminhos de Poder
   e.hp -= dmg; e.flash = 7; e.barT = 160;
+  if (s.poison) {
+    if (!pois) { burst(e.x + e.w / 2, e.y + e.h / 2, 12, POISON, 1.4, -.02, [12, 22]); sfx.poison(); }
+    e.poison = s.poison;
+  }
   if (e.type !== 'shield') e.face = -dir;
   const ex = e.x + e.w / 2, ey = e.y + e.h / 2;
   if (crit) { addNum(dmg + '!', ex, e.y - 10, '#ff8c1a', true); burst(ex, ey, 12, ['#ffffff', '#ffd23f', '#ff8c1a'], 2.6, 0, [8, 16]); }
-  else addNum(dmg, ex, e.y - 6, s.dmg >= 18 ? '#ffd23f' : '#ffffff');
+  else addNum(dmg, ex, e.y - 6, pois ? '#9dff6a' : s.dmg >= 18 ? '#ffd23f' : '#ffffff');
   burst(ex - dir * 4, ey, 8, ['#ffffff', '#ffd23f', e.pal.hi], 2, .05, [6, 14]);
   burst(ex, ey, 5, [e.pal.shell, e.pal.dark], 1.4, .15, [12, 22]);
   hitstop = Math.max(hitstop, s.stop); shake = Math.max(shake, s.shake); sfx.hit(s.dmg >= 18 ? 1.4 : 1);
@@ -1392,10 +1621,12 @@ function killEnemy(e) {
   const [a, b] = ETYPES[e.type].coins;
   for (let i = irand(a, b); i > 0; i--) coins.push({ x: ex, y: ey, w: 3, h: 3, vx: rand(-1.6, 1.6), vy: rand(-3.2, -1.6), t: 0, ground: false });
 }
+const COIN_LIFE = 600, COIN_BLINK = 150;   // 10 s no chão; pisca nos últimos 2,5 s
 function updateCoins() {
   const px = pl.x + pl.w / 2, py = pl.y + pl.h / 2;
   coins.forEach(c => {
-    c.t++;
+    // moeda que ninguém pega pisca e some depois de uns segundos
+    if (++c.t > COIN_LIFE) { c.got = true; addP(c.x, c.y, 0, -.4, 10, SMOKE); return; }
     const dx = px - c.x, dy = py - c.y, d = Math.hypot(dx, dy);
     if (mode === 'play' && c.t > 20 && d < 40) {
       // ímã: voa até o herói
@@ -1415,9 +1646,10 @@ function updateCoins() {
 // encontros e emboscadas
 function updateEncounters() {
   const px = pl.x + pl.w / 2;
-  ENCOUNTERS.forEach(en => { if (!en.done && px > en.at * TS) { en.done = true; en.list.forEach(([t, x, r]) => spawnEnemy(t, x, r)); } });
+  const here = o => (o.lv || 'masmorra') === biome;
+  ENCOUNTERS.forEach(en => { if (!en.done && here(en) && px > en.at * TS) { en.done = true; en.list.forEach(([t, x, r]) => spawnEnemy(t, x, r)); } });
   AMBUSHES.forEach(a => {
-    if (a.state === 'idle' && px > a.at * TS) {
+    if (a.state === 'idle' && here(a) && px > a.at * TS) {
       a.state = 'active'; a.wave = 0; a.delay = 40;
       a.gates.forEach(i => setGate(GATES[i], true)); sfx.gate(); shake = Math.max(shake, 3);
       banner('Emboscada!', 'derrote todos os bugs para abrir os portões');
@@ -1441,8 +1673,39 @@ function resetLevel() {
   SECRETS.forEach(c => { c.found = false; c.reveal = 0; c.hint = 0; });
   chests = CHESTS.map(c => ({ ...c, x: c.tx * TS + 4, y: c.row * TS, open: false, lid: 0 }));
   items = PEDESTALS.map(([tx, row, wid]) => ({ kind: 'weapon', x: tx * TS + 4, y: row * TS, wid, group: 'start', lift: 18 }));
-  pl.weapon = null;
+  SHOP_ITEMS.forEach(([tx, kind, wid, price]) => items.push({ kind, wid, price, x: tx * TS + 4, y: SHOP_START.y, lift: 20 }));
+  pl.weapon = null; biome = 'masmorra'; ghosts = []; scrollFx = null;
 }
+// o herói passa pela porta e aparece no próximo bioma: Masmorra → Lojinha → Esgoto Tóxico
+function enterBiome(b) {
+  const B = BIOMES[b];
+  biome = b; mode = 'play';
+  const start = B.start;
+  enemies = []; shots = []; arrows = []; frags = []; blasts = []; ghosts = []; scrollFx = null;
+  coins = [];   // moedas que ficaram no chão se perdem
+  Object.assign(pl, { x: start.x, y: start.y - pl.h, vx: 0, vy: 0, face: 1, atk: null, roll: 0, hurt: 0, drink: 0, inv: 0, atkBuf: 0, heavyBuf: 0 });
+  pl.safe = { x: pl.x, y: pl.y };
+  snapCam(); fade = -.8; keys.clear(); bannerQ.length = 0;
+  burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 26, ['#ffffff', '#ffd23f', CHARS[heroIdx].color], 2, 0, [12, 24]);
+  sfx.teleport();
+  if (testMode) banner('Teste: ' + B.name, 'moedas infinitas · Esc > Teste para trocar de bioma');
+  else banner(B.name, B.sub);
+}
+// menu de teste: teleporta direto para o bioma escolhido, mantendo a arma atual
+function testGo(b) {
+  const w = pl.weapon;
+  ['pauseScreen', 'testScreen'].forEach(id => $(id).hidden = true);
+  resetPlayer(); resetLevel();
+  pl.weapon = w; if (w) pl.carry = WEAPONS[w].idle;
+  testMode = true;
+  if (b === 'masmorra') { setGate(GATES[0], false); GATES[0].lift = 1; }
+  renderHp(); renderCoins(); renderTest();
+  enterBiome(b);
+}
+function renderTest() { $('testBadge').hidden = !testMode; }
+const canAfford = price => testMode || coinCount >= price;
+// poça tóxica em que o objeto (herói ou bug) afundou
+const poolAt = o => biome === 'esgoto' && POOLS.find(p => o.y + o.h > p.y * TS + 3 && o.x + o.w / 2 > p.x0 * TS && o.x + o.w / 2 < (p.x1 + 1) * TS);
 // item ou baú fechado mais perto do herói (no mesmo chão)
 function nearItem() {
   let best = null, bd = 14;
@@ -1456,16 +1719,52 @@ const secretOf = (x, y) => SECRETS.find(c => x >= c.x0 && x <= c.x1 && y >= c.y0
 const shownAt = (x, y) => { const c = secretOf(Math.floor(x / TS), Math.floor((y - 4) / TS)); return c ? c.reveal : 1; };
 function openChest(c) {
   c.open = true; sfx.chest(); shake = Math.max(shake, 2);
+  if (c.power) {
+    // o pergaminho salta do baú; no alto do salto ele se abre e aplica o poder
+    burst(c.x, c.y - 8, 24, ['#ffffff', '#e9dcff', '#a77bff', '#ffd23f'], 2, -.02, [14, 26]);
+    scrollFx = { x: c.x, y: c.y - 10, vy: -3.6, t: 0 };
+    return;
+  }
   burst(c.x, c.y - 8, 24, ['#ffffff', '#ffd23f', '#f5801e'], 2, -.02, [14, 26]);
   const g = 'chest' + c.tx;
   items.push({ kind: 'weapon', wid: c.wid, x: c.x - 12, y: c.y, group: g, lift: 26 });
   items.push({ kind: 'potion', x: c.x + 12, y: c.y, group: g, lift: 26 });
   banner('Baú aberto!', 'escolha: a arma nova ou uma poção de cura');
 }
+let scrollFx = null;   // pergaminho saltando do Baú de Poder
+function updateScroll() {
+  const s = scrollFx;
+  if (!s) return;
+  s.t++; s.y += s.vy; s.vy += .12;
+  if (T % 2 === 0) addP(s.x + rand(-3, 3), s.y + rand(-2, 2), 0, rand(-.3, 0), 14, ['#ffffff', '#e9dcff', '#a77bff']);
+  if (s.vy >= 0) { scrollFx = null; applyScroll(s.x, s.y); }
+}
+function applyScroll(x, y) {
+  const oldMax = pl.max, oldMul = pl.dmgMul;
+  pl.max = Math.round(pl.max * SCROLL_HP); pl.hp += pl.max - oldMax; pl.dmgMul = +(pl.dmgMul * SCROLL_DMG).toFixed(2); pl.scrolls++;
+  burst(x, y, 34, ['#ffffff', '#e9dcff', '#a77bff', '#ffd23f'], 2.6, 0, [16, 30], 2);
+  burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 20, ['#ffffff', '#e9dcff', '#a77bff'], 1.6, -.03, [14, 26]);
+  shake = Math.max(shake, 4); sfx.power(); renderHp();
+  const bar = $('hpBar'); bar.classList.remove('grow'); void bar.offsetWidth; bar.classList.add('grow');   // a barra de vida cresce e brilha
+  // cartão do pergaminho saltando na tela com os bônus aplicados
+  $('scrollHp').textContent = `${oldMax} → ${pl.max}`;
+  $('scrollDmg').textContent = `×${fmtMul(oldMul)} → ×${fmtMul(pl.dmgMul)}`;
+  const el = $('scrollPop'); el.hidden = false; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+const fmtMul = m => String(+m.toFixed(2)).replace('.', ',');
 function pickItem() {
   const it = nearItem();
   if (!it || mode !== 'play') return;
   if (it.tx !== undefined) { openChest(it); return; }
+  if (it.price) {
+    if (!canAfford(it.price)) {
+      sfx.nope(); const el = $('coins'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      banner('Moedas insuficientes', `faltam ${it.price - coinCount} moedas para este item`);
+      return;
+    }
+    if (!testMode) coinCount -= it.price; renderCoins(); sfx.buy();
+    burst(it.x, it.y - it.lift - 10, 16, ['#fff6c2', '#ffd23f', '#5a3f0a'], 1.6, .05, [10, 20]);
+  }
   items = items.filter(o => o !== it);
   // escolha: as outras opções do mesmo grupo se desfazem
   if (it.group) {
@@ -1477,7 +1776,15 @@ function pickItem() {
   sfx.pickup();
   if (it.kind === 'potion') {
     pl.potions++; renderHp(); flashPot();
-    banner('Poção de cura', `agora você tem ${pl.potions} (Q para beber)`);
+    banner(it.price ? 'Poção comprada!' : 'Poção de cura', `agora você tem ${pl.potions} (Q para beber)`);
+    return;
+  }
+  if (it.price) {
+    const old = pl.weapon;
+    pl.weapon = it.wid; pl.atk = null; pl.combo = 0; pl.carry = WEAPONS[it.wid].idle;
+    if (old) items.push({ kind: 'weapon', x: pl.x + pl.w / 2 - pl.face * 14, y: it.y, wid: old, lift: 12 });
+    renderHp();
+    banner(WEAPONS[it.wid].name + ' comprada!', old ? 'a arma antiga ficou no chão' : 'arma equipada');
     return;
   }
   const old = pl.weapon;
@@ -1507,7 +1814,9 @@ function camTarget() {
   const feet = pl.y + pl.h;
   if (pl.ground || feet > cam.floor) cam.floor = feet;
   const ty = Math.min(cam.floor - CAM_FEET, pl.y - CAM_TOP);
-  return [clamp(pl.x + pl.w / 2 - W / 2 + cam.look, 0, MW * TS - W), clamp(ty, 0, MH * TS - H)];
+  // a câmera só mostra o bioma atual
+  const S = BIOMES[biome];
+  return [clamp(pl.x + pl.w / 2 - W / 2 + cam.look, S.x0 * TS, S.x1 * TS - W), clamp(ty, 0, MH * TS - H)];
 }
 function snapCam() { cam.look = pl.face * 30; cam.floor = pl.y + pl.h; [cam.x, cam.y] = camTarget(); }
 
@@ -1519,9 +1828,10 @@ function update() {
   if (mode === 'title' && T % 8 === 0) drawPicks();
   if (mode === 'exit') updateExit();
   if (mode === 'dead' && ++deadT === 80) showDead();
-  if (mode === 'play') { updateEncounters(); updateSecrets(); }
+  if (mode === 'play' && biome !== 'loja') { updateEncounters(); updateSecrets(); }
   if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); updateShots(); updateFrags(); updateCoins(); }
   chests.forEach(c => { if (c.open && c.lid < 1) c.lid = Math.min(1, c.lid + .15); });
+  updateScroll();
   // portões: abrem devagar (sobem) e fecham rápido (descem)
   GATES.forEach(g => {
     const want = g.closed ? 0 : 1;
@@ -1529,6 +1839,7 @@ function update() {
     g.lift = want ? Math.min(1, g.lift + .02) : Math.max(0, g.lift - .1);
     if (T % 3 === 0) addP(g.tx * TS + rand(0, 8), g.y0 * TS, rand(-.2, .2), rand(.2, .6), 20, DUST, .05);
   });
+  ghosts.forEach(g => g.life--); ghosts = ghosts.filter(g => g.life > 0);
   nums.forEach(n => { n.t++; n.y -= Math.max(0, 1.1 - n.t * .06); });
   nums = nums.filter(n => n.t < 45);
   shake *= .85; if (shake < .3) shake = 0;
@@ -1544,10 +1855,15 @@ function update() {
   // poeira flutuante no ar (como esporos)
   if (T % 6 === 0) {
     const x = cam.x + rand(0, W), y = cam.y + rand(0, H);
-    if (tile(Math.floor(x / TS), Math.floor(y / TS)) !== SOLID) addP(x, y, rand(-.12, .12), rand(-.18, -.05), irand(120, 220), ['#2c6a64', '#5fd1b8', '#2c6a64']);
+    if (tile(Math.floor(x / TS), Math.floor(y / TS)) !== SOLID) addP(x, y, rand(-.12, .12), rand(-.18, -.05), irand(120, 220), biome === 'esgoto' ? ['#4f7a33', '#b5ff7a', '#4f7a33'] : ['#2c6a64', '#5fd1b8', '#2c6a64']);
   }
-  TORCHES.forEach(([tx, ty]) => { if (T % 7 === (tx % 7)) addP(tx * TS + 4 + rand(-1, 1), ty * TS, rand(-.1, .1), rand(-.6, -.3), irand(14, 26), FLAME); });
-  if (T % 5 === 0) addP(DOOR.x + rand(2, 14), DOOR.y + DOOR.h - 2, rand(-.1, .1), rand(-.5, -.2), irand(30, 50), ['#ffd23f', '#f5801e', '#7a2a2a']);
+  TORCHES.forEach(([tx, ty]) => { if (T % 7 === (tx % 7)) addP(tx * TS + 4 + rand(-1, 1), ty * TS, rand(-.1, .1), rand(-.6, -.3), irand(14, 26), flameOf(tx)); });
+  if (biome === 'esgoto') {
+    // gotas de gosma caindo dos canos e bolhas subindo das poças
+    PIPES.forEach(([px, py], i) => { if (T % 23 === i * 5) addP(px * TS + 4 + rand(-6, 6), py * TS + 4 + 13, 0, .3, 60, ['#b5ff7a', '#5fd13a'], .08, 1); });
+    POOLS.forEach(p => { if (T % 9 === 0) addP(rand(p.x0 * TS, (p.x1 + 1) * TS), p.y * TS + 1, rand(-.05, .05), rand(-.5, -.2), irand(10, 18), ['#e9ffe0', '#b5ff7a'], 0, irand(1, 2)); });
+  }
+  if (T % 5 === 0) { const D = curDoor(); addP(D.x + rand(2, 14), D.y + D.h - 2, rand(-.1, .1), rand(-.5, -.2), irand(30, 50), ['#ffd23f', '#f5801e', '#7a2a2a']); }
   parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life--; });
   parts = parts.filter(p => p.life > 0);
   if (parts.length > 900) parts.splice(0, parts.length - 900);
@@ -1558,7 +1874,8 @@ function updateExit() {
   exitT++;
   const cx = pl.x + pl.w / 2, cy = pl.y + pl.h / 2;
   if (exitT < EXIT_GONE) {
-    pl.x += (DOOR.x + DOOR.w / 2 - pl.w / 2 - pl.x) * .15;
+    const D = curDoor();
+    pl.x += (D.x + D.w / 2 - pl.w / 2 - pl.x) * .15;
     const a = rand(0, Math.PI * 2), d = rand(14, 22);
     addP(cx + Math.cos(a) * d, cy + Math.sin(a) * d, -Math.cos(a) * d / 12, -Math.sin(a) * d / 12, 12, ['#ffffff', '#ffd23f', CHARS[heroIdx].color]);
   }
@@ -1567,7 +1884,7 @@ function updateExit() {
     for (let i = 0; i < 16; i++) addP(cx + rand(-2, 2), cy, rand(-.2, .2), rand(-4, -2), irand(18, 30), ['#ffffff', '#ffd23f']);
     fade = -.6; sfx.zap();
   }
-  if (exitT >= EXIT_END) showWin();
+  if (exitT >= EXIT_END) { const nx = BIOMES[biome].next; if (nx) enterBiome(nx); else showWin(); return; }
   const [tx, ty] = camTarget();
   cam.x += (tx - cam.x) * .08; cam.y += (ty - cam.y) * .08;
 }
@@ -1596,7 +1913,7 @@ function draw() {
   });
 
   // porta: brilho pulsando
-  const pulse = .5 + .5 * Math.sin(T / 20);
+  const pulse = .5 + .5 * Math.sin(T / 20), DOOR = curDoor();
   lc.fillStyle = `rgba(245,128,30,${.25 + .25 * pulse})`; lc.fillRect(DOOR.x - cx, DOOR.y - cy, DOOR.w, DOOR.h);
   lc.fillStyle = `rgba(255,210,63,${.2 + .2 * pulse})`; lc.fillRect(DOOR.x - cx + 3, DOOR.y - cy + 4, DOOR.w - 6, DOOR.h - 4);
 
@@ -1604,10 +1921,20 @@ function draw() {
   TORCHES.forEach(([tx, ty]) => {
     const X = tx * TS - cx, Y = ty * TS - cy;
     if (X < -10 || X > W + 10 || Y < -10 || Y > H + 10) return;
-    const h = 4 + ((T >> 2) + tx) % 3;
-    lc.fillStyle = FLAME[3]; lc.fillRect(X + 2, Y + 3 - h + 2, 4, h);
-    lc.fillStyle = FLAME[2]; lc.fillRect(X + 3, Y + 3 - h, 2, h);
-    lc.fillStyle = FLAME[0]; lc.fillRect(X + 3, Y + 1, 2, 2);
+    const h = 4 + ((T >> 2) + tx) % 3, F = flameOf(tx);
+    lc.fillStyle = F[3]; lc.fillRect(X + 2, Y + 3 - h + 2, 4, h);
+    lc.fillStyle = F[2]; lc.fillRect(X + 3, Y + 3 - h, 2, h);
+    lc.fillStyle = F[0]; lc.fillRect(X + 3, Y + 1, 2, 2);
+  });
+  // poças de gosma tóxica: superfície ondulando e brilho por cima
+  if (biome === 'esgoto') POOLS.forEach(p => {
+    const X0 = p.x0 * TS - cx, w = (p.x1 - p.x0 + 1) * TS, Y = p.y * TS - cy;
+    if (X0 > W || X0 + w < 0) return;
+    R(X0, Y + 2, w, H - Y, '#3c9a2a'); R(X0, Y + 6, w, H - Y, '#2f7a22');
+    for (let x = 0; x < w; x++) {
+      const wv = Math.round(Math.sin((x + T * .6) / 5) * 1.2 + Math.sin((x - T * .4) / 3) * .6);
+      R(X0 + x, Y + 1 + wv, 1, 2, '#7dff4a'); R(X0 + x, Y + wv, 1, 1, '#d8ffb0');
+    }
   });
 
   drawPedestals(cx, cy);
@@ -1619,6 +1946,12 @@ function draw() {
   frags.forEach(f => { R(Math.round(f.x - cx), Math.round(f.y - cy), 2, 1, T % 2 ? '#ffd23f' : '#ffffff'); });
   blasts.forEach(b => drawBlast(b, cx, cy));
 
+  // rastro do avanço da katana: silhuetas que somem
+  ghosts.forEach(g => {
+    lc.save(); lc.globalAlpha = g.life / 12 * .45;
+    lc.translate(Math.round(g.x - cx), Math.round(g.y - cy) - 17); if (g.face < 0) lc.scale(-1, 1);
+    lc.drawImage(spriteSil(heroIdx, g.pose, '#c8f8ff'), -17, -17); lc.restore();
+  });
   // herói
   const hx = Math.round(pl.x + pl.w / 2 - cx), hy = Math.round(pl.y + pl.h - cy);
   if (mode === 'exit') drawExit(hx, hy);
@@ -1666,6 +1999,14 @@ function draw() {
   lc.globalCompositeOperation = 'lighter';
   lc.globalAlpha = .3 + .2 * pulse; lc.drawImage(GLOW_O, DOOR.x + 8 - cx - 36, DOOR.y + 16 - cy - 36, 72, 72);
   items.forEach(it => { lc.globalAlpha = .5 * shownAt(it.x, it.y); lc.drawImage(GLOW_O, it.x - cx - 18, it.y - it.lift + 2 - cy - 18, 36, 36); });
+  if (biome === 'esgoto') {
+    // brilho verde das poças e dos canos, vermelho das tochas
+    lc.globalAlpha = .35 + .1 * pulse;
+    POOLS.forEach(p => { const w = (p.x1 - p.x0 + 1) * TS; lc.drawImage(GLOW_G, p.x0 * TS - cx - 16, p.y * TS - cy - 30, w + 32, 50); });
+    PIPES.forEach(([px, py]) => lc.drawImage(GLOW_G, px * TS + 4 - cx - 22, py * TS + 4 - cy - 16, 44, 44));
+    lc.globalAlpha = .3;
+    TORCHES.forEach(([tx, ty]) => { if (tx >= SEWER_X0) lc.drawImage(GLOW_R, tx * TS + 4 - cx - 16, ty * TS - cy - 16, 32, 32); });
+  }
   lc.globalAlpha = 1; lc.globalCompositeOperation = 'source-over';
   if (pl.weapon && WEAPONS[pl.weapon].combo[0].ranged && mouseScr && mode === 'play') {   // mira de qualquer arma de longe
     const mx = Math.round(mouseScr.x), my = Math.round(mouseScr.y), c = '#ffd23f';
@@ -1730,6 +2071,19 @@ function drawWeapon(id, x, y, ang, face, pull = 0) {
     for (let k = 0; k <= 1; k += .1) { p(9 - 36 / 16 + (1 - 9 + 36 / 16) * k, -6 + 6 * k, '#e8e0d0'); p(9 - 36 / 16 + (1 - 9 + 36 / 16) * k, 6 - 6 * k, '#e8e0d0'); }
     const atk = pl.atk, fired = id === pl.weapon && atk && atk.f >= atk.s.wind;
     if (!fired) { for (let t = 1; t <= 11; t += .5) p(t, -1.5, '#5a3a24'); p(11.5, -1.5, '#c3ccd4'); p(12, -1.5, '#ffffff'); p(1, -2.2, '#f5801e'); }
+  } else if (id === 'zarabatana') {
+    // canudo de bambu com anéis e um bocal verde; o dardo aparece na ponta enquanto mira
+    for (let t = -5; t <= 13; t += .5) { const ring = Math.round(t) % 4 === 0; p(t, 0, ring ? '#4f6b2a' : '#a8c86a'); p(t, .8, ring ? '#3a5020' : '#6f8c3e'); }
+    p(-5.5, 0, '#2a6b1f'); p(-5.5, .8, '#2a6b1f'); p(13.5, 0, '#3a5020'); p(13.5, .8, '#3a5020');
+    if (pull > 0) { p(14.5, .4, '#9dff6a'); p(15.5, .4, '#e3e9ee'); }
+  } else if (id === 'katana') {
+    // cabo trançado, guarda dourada e lâmina fina levemente curva
+    for (let t = -5; t <= 0; t += .5) p(t, 0, Math.round(t * 2) % 2 ? '#c8203f' : '#2a2236');
+    p(-5.5, 0, '#d9a640');
+    for (let s = -1.5; s <= 1.5; s += .5) p(1, s, '#d9a640');
+    for (let t = 2; t <= 17; t += .5) { const c = -(t - 2) * (t - 2) / 110; p(t, c, '#a9b4be'); p(t, c - .8, '#e8eef3'); }
+    p(17.5, -2.3, '#ffffff');
+    if (T % 50 < 5) p(4 + (T % 50) * 3, -1, '#ffffff');
   }
 }
 function drawArrow(ar, cx, cy) {
@@ -1737,6 +2091,17 @@ function drawArrow(ar, cx, cy) {
   const x = ar.x - cx, y = ar.y - cy;
   if (x < -12 || x > W + 12 || y < -12 || y > H + 12) return;
   if (ar.stuck && ar.stuck < 15 && T % 2) return;
+  const P = (t, s, c) => R(Math.round(x + ux * t - uy * s), Math.round(y + uy * t + ux * s), 1, 1, c);
+  if (ar.s.dart) {   // dardo: curto, ponta de metal e pena verde
+    for (let t = -5; t <= 0; t += .5) P(t, 0, t > -1 ? '#ffffff' : t > -2 ? '#c3ccd4' : t < -3.5 ? '#9dff6a' : '#e8e0d0');
+    P(-5, -.8, '#4fb83a'); P(-5, .8, '#4fb83a');
+    return;
+  }
+  if (ar.s.dagger) {   // adaga: lâmina larga e cabo escuro
+    for (let t = -6; t <= 0; t += .5) { const c = t > -.5 ? '#ffffff' : t > -3.5 ? '#e8eef3' : t > -4.5 ? '#d9a640' : '#2a2236'; P(t, 0, c); if (t > -3.5 && t < -.5) P(t, -.8, '#a9b4be'); }
+    P(-4, -1.2, '#d9a640'); P(-4, 1.2, '#d9a640');
+    return;
+  }
   if (ar.heavy && !ar.stuck) for (let t = -10; t <= 1; t += .5) { R(Math.round(x + ux * t - uy), Math.round(y + uy * t + ux), 1, 1, '#ffd23f'); R(Math.round(x + ux * t + uy), Math.round(y + uy * t - ux), 1, 1, '#ffd23f'); }
   if (ar.s.bolt) { for (let t = -7; t <= 0; t += .5) { const c = t > -2 ? '#ffffff' : t > -3 ? '#c3ccd4' : t < -5.5 ? '#f5801e' : '#5a3a24'; R(Math.round(x + ux * t), Math.round(y + uy * t), 1, 1, c); R(Math.round(x + ux * t - uy * .8), Math.round(y + uy * t + ux * .8), 1, 1, c); } return; }
   for (let t = -9; t <= 0; t += .5) R(Math.round(x + ux * t), Math.round(y + uy * t), 1, 1, t > -1.5 ? '#ffffff' : t > -2.5 ? '#c3ccd4' : t < -7.5 ? '#ff6b3d' : '#c8a26b');
@@ -1756,6 +2121,13 @@ function drawSlash(px, py) {
   if (!a) return;
   const s = a.s, f = a.f - s.wind;
   if (f < 0 || f > s.act + 5) return;
+  if (s.dash && a.x0 !== undefined) {
+    // risco de luz do ponto de partida até onde o herói está
+    const fk = f >= s.act ? 1 - (f - s.act) / 6 : 1, sx = px - (pl.x + pl.w / 2 - a.x0), x0 = Math.round(Math.min(sx, px)), w = Math.round(Math.abs(px - sx)) + 1, y = Math.round(py);
+    lc.globalAlpha = .5 * fk; R(x0, y - 2, w, 1, WEAPONS[pl.weapon].tint); R(x0, y + 1, w, 1, WEAPONS[pl.weapon].tint);
+    lc.globalAlpha = fk; R(x0, y - 1, w, 2, '#ffffff');
+    lc.globalAlpha = 1;
+  }
   if (s.thrust) {
     const fk = f >= s.act ? 1 - (f - s.act) / 6 : 1, len = s.reach * Math.min(1, (f + 1) / s.act);
     lc.globalAlpha = fk;
@@ -1778,6 +2150,12 @@ function drawPedestals(cx, cy) {
     const X = tx * TS + 4 - cx, Y = row * TS - cy;
     R(X - 6, Y - 6, 12, 6, '#1a404c'); R(X - 8, Y - 8, 16, 2, '#2c6470'); R(X - 8, Y - 8, 16, 1, '#4aa383'); R(X - 5, Y - 4, 10, 1, '#102a32'); R(X + 5, Y - 6, 1, 6, '#0d232a');
   });
+  // balcões da lojinha: madeira com borda dourada
+  if (biome === 'loja') SHOP_ITEMS.forEach(([tx]) => {
+    const X = tx * TS + 4 - cx, Y = SHOP_START.y - cy;
+    R(X - 7, Y - 7, 14, 7, '#140a1f'); R(X - 6, Y - 6, 12, 6, '#7a4a26'); R(X - 6, Y - 4, 12, 1, '#4a2c18');
+    R(X - 8, Y - 9, 16, 3, '#140a1f'); R(X - 7, Y - 8, 14, 1, '#d9a640'); R(X - 7, Y - 7, 14, 1, '#8c5a30');
+  });
   chests.forEach(c => { const a = shownAt(c.x, c.y); if (a > 0) { lc.globalAlpha = a; drawChest(c, cx, cy); lc.globalAlpha = 1; } });
   items.forEach(it => {
     const a = shownAt(it.x, it.y);
@@ -1787,31 +2165,62 @@ function drawPedestals(cx, cy) {
     lc.globalAlpha = a;
     if (it.kind === 'potion') drawPotion(X, Y + 2);
     else drawWeapon(it.wid, X - 4, Y + 6, -55, 1);
+    if (it.price) drawPrice(Math.round(X), Math.round(it.y - cy - it.lift - 16), it.price, canAfford(it.price));
     lc.globalAlpha = 1;
   });
+  if (scrollFx) drawScroll(Math.round(scrollFx.x - cx), Math.round(scrollFx.y - cy), scrollFx.t);
+}
+// pergaminho enrolado: papel creme com laço roxo e as pontas de madeira (gira um pouco enquanto sobe)
+function drawScroll(x, y, t) {
+  const tilt = Math.round(Math.sin(t / 3) * 1);
+  R(x - 7, y - 4 + tilt, 14, 8 - tilt * 2, '#140a1f');
+  R(x - 6, y - 3 + tilt, 12, 6 - tilt * 2, '#f3e2b3'); R(x - 6, y - 3 + tilt, 12, 1, '#fff6d8'); R(x - 6, y + 2 - tilt, 12, 1, '#c9a96b');
+  R(x - 8, y - 5, 2, 10, '#140a1f'); R(x + 6, y - 5, 2, 10, '#140a1f');
+  R(x - 8, y - 4, 1, 8, '#8c5a30'); R(x + 7, y - 4, 1, 8, '#8c5a30');
+  R(x - 1, y - 3 + tilt, 2, 6 - tilt * 2, '#a77bff'); R(x - 2, y + 2, 1, 2, '#a77bff'); R(x + 1, y + 2, 1, 2, '#7c4fd6');
+}
+// etiqueta de preço: moeda + número (amarelo se dá para comprar, vermelho se faltam moedas)
+function drawPrice(x, y, price, ok) {
+  const s = String(price), w = 6 + s.length * 4 - 1, x0 = x - Math.floor(w / 2);
+  R(x0 - 2, y - 2, w + 4, 9, '#140a1f');
+  R(x0, y, 4, 5, '#5a3f0a'); R(x0 + 1, y + 1, 2, 3, '#ffd23f'); R(x0 + 1, y + 1, 1, 1, '#fff6c2');
+  for (let i = 0; i < s.length; i++) {
+    const b = DIG[+s[i]];
+    for (let k = 0; k < 15; k++) if (b[k] === '1') R(x0 + 6 + i * 4 + k % 3, y + Math.floor(k / 3), 1, 1, ok ? '#ffd23f' : '#ff4d6d');
+  }
 }
 function drawPotion(x, y) {
   R(x - 3, y - 3, 7, 8, '#140a1f'); R(x - 2, y - 2, 5, 6, '#ff4d6d'); R(x - 2, y - 2, 5, 1, '#ff8fa3'); R(x - 1, y - 1, 1, 2, '#ffd0da');
   R(x - 2, y - 6, 5, 3, '#140a1f'); R(x - 1, y - 5, 3, 2, '#c8a26b');
 }
 // baú de madeira com cantoneiras douradas; a tampa abre para trás
+// Baú de Poder: mesmo formato, em roxo com runas que brilham
+const CHEST_WOOD = { body: '#7a4a26', bodyHi: '#a86a3a', band: '#4a2c18', trim: '#d9a640', lid: '#8c5a30', lidHi: '#b07a45', lock: '#ffd23f', inside: '#5a3a20', glow: '#ffd23f' };
+const CHEST_POWER = { body: '#4a2a7a', bodyHi: '#6f45b0', band: '#2a1650', trim: '#c8b6ff', lid: '#5a33a0', lidHi: '#8a63d6', lock: '#e9dcff', inside: '#2a1650', glow: '#a77bff' };
 function drawChest(c, cx, cy) {
-  const X = Math.round(c.x - cx), Y = Math.round(c.y - cy);
-  R(X - 8, Y - 9, 16, 9, '#140a1f'); R(X - 7, Y - 8, 14, 8, '#7a4a26'); R(X - 7, Y - 8, 14, 1, '#a86a3a');
-  R(X - 7, Y - 5, 14, 1, '#4a2c18'); R(X - 7, Y - 8, 2, 8, '#d9a640'); R(X + 5, Y - 8, 2, 8, '#d9a640');
+  const X = Math.round(c.x - cx), Y = Math.round(c.y - cy), P = c.power ? CHEST_POWER : CHEST_WOOD;
+  R(X - 8, Y - 9, 16, 9, '#140a1f'); R(X - 7, Y - 8, 14, 8, P.body); R(X - 7, Y - 8, 14, 1, P.bodyHi);
+  R(X - 7, Y - 5, 14, 1, P.band); R(X - 7, Y - 8, 2, 8, P.trim); R(X + 5, Y - 8, 2, 8, P.trim);
   if (!c.open) {
-    R(X - 8, Y - 13, 16, 5, '#140a1f'); R(X - 7, Y - 12, 14, 4, '#8c5a30'); R(X - 7, Y - 12, 14, 1, '#b07a45');
-    R(X - 7, Y - 12, 2, 4, '#d9a640'); R(X + 5, Y - 12, 2, 4, '#d9a640'); R(X - 1, Y - 10, 2, 3, '#ffd23f');
+    R(X - 8, Y - 13, 16, 5, '#140a1f'); R(X - 7, Y - 12, 14, 4, P.lid); R(X - 7, Y - 12, 14, 1, P.lidHi);
+    R(X - 7, Y - 12, 2, 4, P.trim); R(X + 5, Y - 12, 2, 4, P.trim); R(X - 1, Y - 10, 2, 3, P.lock);
+    if (c.power) {
+      // runas pulsando na frente e faíscas subindo
+      const on = (T >> 4) % 2 ? '#e9dcff' : '#a77bff';
+      R(X - 4, Y - 3, 1, 2, on); R(X - 3, Y - 4, 1, 1, on); R(X + 3, Y - 3, 1, 2, on); R(X + 2, Y - 2, 1, 1, on);
+      if (T % 10 === 0) addP(c.x + rand(-7, 7), c.y - 12, 0, rand(-.5, -.2), 22, ['#ffffff', '#e9dcff', '#a77bff']);
+    }
     if (T % 50 < 4) R(X - 6 + (T % 50) * 3, Y - 12, 1, 1, '#ffffff');
   } else {
     const h = Math.round(4 + 3 * c.lid);
-    R(X - 8, Y - 9 - h, 16, h, '#140a1f'); R(X - 7, Y - 8 - h, 14, h - 1, '#5a3a20'); R(X - 7, Y - 8 - h, 14, 1, '#8c5a30');
-    R(X - 6, Y - 8, 12, 2, '#ffd23f');
+    R(X - 8, Y - 9 - h, 16, h, '#140a1f'); R(X - 7, Y - 8 - h, 14, h - 1, P.inside); R(X - 7, Y - 8 - h, 14, 1, P.lid);
+    R(X - 6, Y - 8, 12, 2, P.glow);
   }
 }
 function drawCoin(c, cx, cy) {
   const x = Math.round(c.x - cx), y = Math.round(c.y - cy), f = (T + c.t * 3 >> 3) % 4;
   if (x < -4 || x > W + 4 || y < -4 || y > H + 4) return;
+  if (c.t > COIN_LIFE - COIN_BLINK && T % (c.t > COIN_LIFE - 50 ? 4 : 8) < 3) return;
   const w = f === 0 ? 3 : f === 2 ? 1 : 2;
   R(x - (w >> 1) - 1, y - 2, w + 2, 5, '#5a3f0a'); R(x - (w >> 1), y - 1, w, 3, '#ffd23f'); if (w > 1) R(x - (w >> 1), y - 1, 1, 1, '#fff6c2');
 }
@@ -1849,7 +2258,7 @@ function drawEnemy(e, cx, cy) {
     const ey = B - (ETYPES[e.type].fly ? 28 : 32) - ((T >> 3) % 2), col = e.st === 'wind' ? (e.t > e.windLen - 10 && T % 4 < 2 ? '#ffffff' : '#ffd23f') : '#f5801e';
     R(X - 2, ey - 1, 5, 11, '#140a1f'); R(X - 1, ey, 3, 6, col); R(X - 1, ey + 7, 3, 2, col);
   }
-  if (e.barT > 0) { const by = B - (ETYPES[e.type].fly ? 16 : 20); R(X - 9, by, 18, 3, '#140a1f'); R(X - 8, by + 1, Math.max(0, Math.round(16 * e.hp / e.max)), 1, '#ff4d6d'); }
+  if (e.barT > 0) { const by = B - (ETYPES[e.type].fly ? 16 : 20); R(X - 9, by, 18, 3, '#140a1f'); R(X - 8, by + 1, Math.max(0, Math.round(16 * e.hp / e.max)), 1, e.poison > 0 ? '#9dff6a' : '#ff4d6d'); }
 }
 // bug: casco oval, cabeça na frente (e.face), patinhas animadas
 function drawBug(e, X, B) {
@@ -1989,9 +2398,11 @@ function banner(title, sub, wait) {
 }
 function renderHp() {
   $('hpFill').style.transform = `scaleX(${pl.hp / pl.max})`;
+  $('hpBar').style.width = Math.min(82, 58 * pl.max / 100) + '%';
+  $('hpNum').textContent = `${pl.hp}/${pl.max}`;
   $('pot').innerHTML = `<b></b>Poção de cura ×${pl.potions} <kbd>Q</kbd>`;
   $('pot').classList.toggle('empty', pl.potions <= 0);
-  $('hWeapon').textContent = pl.weapon ? WEAPONS[pl.weapon].name : 'sem arma';
+  $('hWeapon').textContent = (pl.weapon ? WEAPONS[pl.weapon].name : 'sem arma') + (pl.dmgMul > 1 ? ` · dano ×${fmtMul(pl.dmgMul)}` : '');
 }
 // ficha da arma quando o herói chega perto dela
 let tipItem = null;
@@ -2004,7 +2415,8 @@ function updateTip() {
       $('tipAct').textContent = it.tx !== undefined ? 'abrir' : 'pegar';
       $('tipStats').innerHTML = ''; $('tipHeavy').innerHTML = ''; $('tipNote').textContent = '';
       if (it.tx !== undefined) {
-        $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.';
+        if (it.power) { $('tipName').textContent = 'Baú de Poder'; $('tipDesc').textContent = 'Guarda um Pergaminho de Poder: +20% de vida máxima e dano ×1,5 com qualquer arma.'; }
+        else { $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.'; }
       } else if (it.kind === 'potion') {
         $('tipName').textContent = 'Poção de cura'; $('tipDesc').textContent = 'Enche toda a vida quando você bebe (Q).';
         $('tipNote').textContent = choice;
@@ -2014,6 +2426,10 @@ function updateTip() {
         $('tipHeavy').innerHTML = `Botão direito: <b>${w.heavyName}</b>, ${w.heavyDesc}`;
         $('tipStats').innerHTML = w.stats.map(([k, v]) => `<span>${k}</span><i>${'■'.repeat(v)}${'□'.repeat(3 - v)}</i>`).join('');
         $('tipNote').textContent = [w.note, choice].filter(Boolean).join(' ');
+      }
+      if (it.price) {
+        $('tipAct').textContent = `comprar por ${it.price} moedas`;
+        if (!canAfford(it.price)) $('tipNote').textContent = [$('tipNote').textContent, `Você tem ${coinCount} moedas: faltam ${it.price - coinCount}.`].filter(Boolean).join(' ');
       }
     }
   }
@@ -2026,7 +2442,7 @@ function updateTip() {
     tip.style.top = clamp(above >= gap ? above : below, gap, shh - th - gap) + 'px';
   }
 }
-function renderCoins() { $('coinN').textContent = coinCount; const el = $('coins'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function renderCoins() { $('coinN').textContent = testMode ? '∞' : coinCount; const el = $('coins'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 function flashPot() { const el = $('pot'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
 function renderHero() {
   const c = CHARS[heroIdx];
@@ -2042,7 +2458,7 @@ function select(i) {
 }
 function showPicker() {
   mode = 'title'; keys.clear();
-  ['pauseScreen', 'winScreen', 'deadScreen'].forEach(id => $(id).hidden = true);
+  ['pauseScreen', 'testScreen', 'winScreen', 'deadScreen'].forEach(id => $(id).hidden = true);
   $('titleScreen').hidden = false; renderHero();
   $('startBtn').focus({ preventScroll: true });
 }
@@ -2067,14 +2483,24 @@ function drawPicks() {
 }
 function startGame() {
   ac();
-  ['titleScreen', 'pauseScreen', 'winScreen', 'deadScreen'].forEach(id => $(id).hidden = true);
-  bannerQ.length = 0;
+  ['titleScreen', 'pauseScreen', 'testScreen', 'winScreen', 'deadScreen', 'scrollPop'].forEach(id => $(id).hidden = true);
+  bannerQ.length = 0; testMode = false; renderTest();   // recomeçar sai do ambiente de teste
+  Object.assign(pl, { max: 100, dmgMul: 1, scrolls: 0 });   // partida nova: sem os bônus dos pergaminhos
   resetPlayer(); resetLevel(); renderHp(); renderCoins(); playT = 0; renderTimer(); parts = []; fade = 1; hitstop = 0; shake = 0; hurtFx = 0;
   mode = 'play';
   banner('Masmorra', 'escolha uma arma nos pedestais');
 }
 function pause() { if (mode !== 'play') return; mode = 'pause'; $('pauseScreen').hidden = false; $('resumeBtn').focus({ preventScroll: true }); }
-function resume() { if (mode !== 'pause') return; mode = 'play'; $('pauseScreen').hidden = true; keys.clear(); }
+function resume() { if (mode !== 'pause') return; mode = 'play'; $('pauseScreen').hidden = true; $('testScreen').hidden = true; keys.clear(); }
+// menu de teste (dentro da pausa): um botão por bioma, as lojas separadas
+function showTest() { $('pauseScreen').hidden = true; $('testScreen').hidden = false; $('testScreen').querySelector('button').focus({ preventScroll: true }); }
+function hideTest() { $('testScreen').hidden = true; $('pauseScreen').hidden = false; $('testBtn').focus({ preventScroll: true }); }
+Object.entries(BIOMES).forEach(([id, B]) => {
+  const b = document.createElement('button');
+  b.className = 'ghost'; b.textContent = B.name;
+  b.addEventListener('click', () => testGo(id));
+  $(B.shop ? 'testShops' : 'testBiomes').appendChild(b);
+});
 function win() {
   mode = 'exit'; exitT = 0; keys.clear(); renderTimer();
   Object.assign(pl, { vx: 0, vy: 0, roll: 0 });
@@ -2084,7 +2510,7 @@ function showDead() { $('deadCoins').textContent = coinCount; $('deadScreen').hi
 function showWin() {
   mode = 'won'; sfx.win();
   let best = playT;
-  try { const b = +localStorage.getItem('masmorra-best'); if (b > 0 && b < best) best = b; localStorage.setItem('masmorra-best', best); } catch (e) {}
+  if (!testMode) try { const b = +localStorage.getItem('masmorra-best'); if (b > 0 && b < best) best = b; localStorage.setItem('masmorra-best', best); } catch (e) {}
   $('winTime').textContent = fmt(playT); $('winBest').textContent = fmt(best); $('winCoins').textContent = coinCount;
   $('winScreen').hidden = false; $('againBtn').focus({ preventScroll: true });
 }
@@ -2092,7 +2518,7 @@ function showWin() {
 addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (e.target.closest && e.target.closest('button') && (k === ' ' || k === 'enter')) return;
-  if (k === 'escape' || k === 'p') { if (mode === 'pause') resume(); else pause(); e.preventDefault(); return; }
+  if (k === 'escape' || k === 'p') { if (!$('testScreen').hidden) hideTest(); else if (mode === 'pause') resume(); else pause(); e.preventDefault(); return; }
   if (k === 'm') { $('snd').click(); return; }
   if (k === 'f') { toggleFs(); return; }
   if (mode === 'title') {
@@ -2151,6 +2577,9 @@ function toggleFs() {
 $('fs').addEventListener('click', e => { toggleFs(); e.currentTarget.blur(); });
 document.addEventListener('fullscreenchange', () => { $('fs').textContent = document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'; resize(); });
 $('resumeBtn').addEventListener('click', resume);
+$('testBtn').addEventListener('click', showTest);
+$('scrollPop').addEventListener('animationend', e => { e.currentTarget.hidden = true; });
+$('testBackBtn').addEventListener('click', hideTest);
 $('snd').addEventListener('click', e => {
   soundOn = !soundOn;
   e.currentTarget.setAttribute('aria-pressed', soundOn);
