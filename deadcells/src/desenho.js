@@ -37,10 +37,12 @@ function draw() {
     }
   });
 
+  drawObstacles(cx, cy);
   drawPedestals(cx, cy);
   coins.forEach(c => drawCoin(c, cx, cy));
   drawGate(cx, cy);
   enemies.forEach(e => drawEnemy(e, cx, cy));
+  drawPet(cx, cy);
   shots.forEach(b => drawShot(b, cx, cy));
   arrows.forEach(ar => drawArrow(ar, cx, cy));
   frags.forEach(f => { R(Math.round(f.x - cx), Math.round(f.y - cy), 2, 1, T % 2 ? '#ffd23f' : '#ffffff'); });
@@ -102,6 +104,7 @@ function draw() {
   // brilho verde das poças e dos canos; tochas com brilho próprio (torchGlow) no bioma que tiver
   lc.globalAlpha = .35 + .1 * pulse;
   L.pools.forEach(p => { const w = (p.x1 - p.x0 + 1) * TS; lc.drawImage(GLOW_G, p.x0 * TS - cx - 16, p.y * TS - cy - 30, w + 32, 50); });
+  glowObstacles(cx, cy);
   L.pipes.forEach(([px, py]) => lc.drawImage(GLOW_G, px * TS + 4 - cx - 22, py * TS + 4 - cy - 16, 44, 44));
   if (L.torchGlow) {
     lc.globalAlpha = .3;

@@ -5,6 +5,7 @@ function loadBiome(b) {
   biome = b; L = BIOMES[b];
   renderBiome(L);
   map = makeMap(L); MW = L.w; MH = L.h;
+  resetObstacles();
   L.gates.forEach(g => setGate(g, g.closed));
   items = L.pedestals.map(([tx, row, wid]) => ({ kind: 'weapon', x: tx * TS + 4, y: row * TS, wid, group: 'start', lift: 18 }));
   L.shopItems.forEach(([tx, kind, wid, price]) => items.push({ kind, wid, price, x: tx * TS + 4, y: L.start.y, lift: 20 }));
@@ -42,7 +43,7 @@ function resetLevel() {
     B.gates.forEach(g => { g.closed = !!g.start; g.lift = g.start ? 0 : 1; });
     B.secrets.forEach(c => { c.found = false; c.reveal = 0; c.hint = 0; });
   });
-  pl.weapon = null; ghosts = []; scrollFx = null;
+  pl.weapon = null; ghosts = []; scrollFx = null; pet = null; petCageOpen = false;
   loadBiome('masmorra');
 }
 // o herói passa pela porta e aparece no próximo bioma: a ordem vem de PHASES (fases.js)
@@ -54,6 +55,8 @@ function enterBiome(b) {
   coins = [];   // moedas que ficaram no chão se perdem
   Object.assign(pl, { x: start.x, y: start.y - pl.h, vx: 0, vy: 0, face: 1, atk: null, roll: 0, hurt: 0, drink: 0, inv: 0, atkBuf: 0, heavyBuf: 0 });
   pl.safe = { x: pl.x, y: pl.y };
+  if (done) pet = null;   // o Alfredão acompanha só até o fim da fase
+  if (pet) Object.assign(pet, { x: pl.x - 10, y: pl.y - 8, vx: 0, vy: 0, st: 'follow', target: null });
   snapCam(); fade = -.8; keys.clear(); bannerQ.length = 0; renderTimer();
   burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 26, ['#ffffff', '#ffd23f', CHARS[heroIdx].color], 2, 0, [12, 24]);
   sfx.teleport();

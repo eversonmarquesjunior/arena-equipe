@@ -7,7 +7,7 @@ const BOTTOM = Infinity;   // carve(..., BOTTOM): escava até o fim do mapa (bur
 // cada bioma diz onde o herói começa (start) e onde fica a porta de saída (door); para onde ela leva vem de PHASES (fases.js)
 // shop = é uma loja (aparece separado no menu de teste)
 const BIOMES = {};
-const BIOME_LISTS = ['torches', 'windows', 'barrels', 'chains', 'pipes', 'pools', 'secrets', 'chests', 'gates', 'pedestals', 'shopItems', 'encounters', 'ambushes'];
+const BIOME_LISTS = ['torches', 'windows', 'barrels', 'chains', 'pipes', 'pools', 'secrets', 'chests', 'gates', 'pedestals', 'shopItems', 'encounters', 'ambushes', 'jets', 'drips', 'crumbles'];
 function defBiome(id, B) {
   BIOME_LISTS.forEach(k => { B[k] = B[k] || []; });
   B.id = id; BIOMES[id] = B;
@@ -89,6 +89,8 @@ function buildLevel(cv, B, view, hide) {
     if (open(x - 1, y)) r(X, Y, 1, TS, C.lit);
     if (open(x + 1, y)) r(X + 7, Y, 1, TS, C.shade);
   }
+  // fundo próprio do bioma (por exemplo, os arcos iluminados do Ossuário): px(x, y, cor) pinta um pixel só onde é vazio
+  if (B.backdrop) B.backdrop((x, y, c) => { const tx = x >> 3, ty = y >> 3; if (tx >= 0 && ty >= 0 && tx < B.w && ty < B.h && view(tx, ty) === AIR) r(x, y, 1, 1, c); });
   // canos redondos do esgoto: aro de pedra, boca escura e gosma escorrendo da borda de baixo
   B.pipes.forEach(([px, py]) => {
     const X = px * TS + 4, Y = py * TS + 4;

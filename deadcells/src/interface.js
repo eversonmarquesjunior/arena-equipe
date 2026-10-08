@@ -36,7 +36,10 @@ function updateTip() {
       const choice = it.group && it.group !== 'start' ? 'Escolha: pegar este item faz a outra opção do baú sumir.' : '';
       $('tipAct').textContent = it.tx !== undefined ? 'abrir' : 'pegar';
       $('tipStats').innerHTML = ''; $('tipHeavy').innerHTML = ''; $('tipNote').textContent = '';
-      if (it.tx !== undefined) {
+      if (it === L.petCage) {
+        $('tipAct').textContent = 'soltar';
+        $('tipName').textContent = 'Alfredão'; $('tipDesc').textContent = 'Um periquito preso na gaiola. Solte e ele lutará ao seu lado a partir de agora!';
+      } else if (it.tx !== undefined) {
         if (it.power) { $('tipName').textContent = 'Baú de Poder'; $('tipDesc').textContent = 'Guarda um Pergaminho de Poder: +20% de vida máxima e dano ×1,5 com qualquer arma.'; }
         else { $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.'; }
       } else if (it.kind === 'potion') {

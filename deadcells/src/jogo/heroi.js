@@ -125,7 +125,7 @@ function updatePlayer() {
     }
     // guarda o último chão firme (longe da beirada) para quando cair no buraco
     const by = Math.floor((pl.y + pl.h) / TS), firm = tx => tile(tx, by) !== AIR;
-    if (firm(Math.floor(pl.x / TS) - 1) && firm(Math.floor((pl.x + pl.w) / TS) + 1)) pl.safe = { x: pl.x, y: pl.y };
+    if (firm(Math.floor(pl.x / TS) - 1) && firm(Math.floor((pl.x + pl.w) / TS) + 1) && !unsafeGround(pl)) pl.safe = { x: pl.x, y: pl.y };
   }
 
   pl.anim = pl.ground && Math.abs(pl.vx) > .3 ? pl.anim + Math.abs(pl.vx) * .085 : 0;

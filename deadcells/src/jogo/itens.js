@@ -25,6 +25,7 @@ function updateCoins() {
 const canAfford = price => testMode || coinCount >= price;
 // item ou baú fechado mais perto do herói (no mesmo chão)
 function nearItem() {
+  const cage = nearPetCage(); if (cage) return cage;
   let best = null, bd = 14;
   const px = pl.x + pl.w / 2, feet = pl.y + pl.h;
   items.forEach(it => { const d = Math.abs(px - it.x); if (d < bd && Math.abs(feet - it.y) < 14) { bd = d; best = it; } });
@@ -73,6 +74,7 @@ const fmtMul = m => String(+m.toFixed(2)).replace('.', ',');
 function pickItem() {
   const it = nearItem();
   if (!it || mode !== 'play') return;
+  if (it === L.petCage) { freePet(); return; }
   if (it.tx !== undefined) { openChest(it); return; }
   if (it.price) {
     if (!canAfford(it.price)) {

@@ -9,7 +9,7 @@ function update() {
   if (mode === 'exit') updateExit();
   if (mode === 'dead' && ++deadT === 80) showDead();
   if (mode === 'play') { updateEncounters(); updateSecrets(); }
-  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); updateShots(); updateFrags(); updateCoins(); }
+  if (mode === 'play' || mode === 'dead' || mode === 'exit') { enemies.forEach(updateEnemy); enemies = enemies.filter(e => !e.dead); updateArrows(); updateShots(); updateFrags(); updateCoins(); updateObstacles(); }
   chests.forEach(c => { if (c.open && c.lid < 1) c.lid = Math.min(1, c.lid + .15); });
   updateScroll();
   // portões: abrem devagar (sobem) e fecham rápido (descem)
@@ -26,7 +26,7 @@ function update() {
   hurtFx *= .9; if (hurtFx < .02) hurtFx = 0;
   if (mode === 'play') {
     playT++;
-    updatePlayer();
+    updatePlayer(); updatePet();
     const [tx, ty] = camTarget();
     cam.x += (tx - cam.x) * .12;
     cam.y += (ty - cam.y) * (!pl.ground && pl.vy > 3 ? .25 : .06);

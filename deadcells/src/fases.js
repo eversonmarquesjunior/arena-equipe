@@ -4,7 +4,7 @@
 
 const PHASES = [
   // planejado: Masmorra → Esgoto Tóxico → Lojinha → Ossuário → Sala Segura → Sala do Chefe 1
-  { name: 'Fase 1', biomes: ['masmorra', 'esgoto', 'loja'] },
+  { name: 'Fase 1', biomes: ['masmorra', 'esgoto', 'loja', 'ossuario'] },
 ];
 PHASES.forEach((P, i) => P.biomes.forEach(b => { BIOMES[b].phase = i; }));
 
