@@ -14,7 +14,7 @@ function banner(title, sub, wait) {
   if (wait && hud.querySelector('.banner')) { bannerQ.push([title, sub]); return; }
   hud.querySelectorAll('.banner').forEach(b => b.remove());
   const d = document.createElement('div'); d.className = 'banner';
-  d.innerHTML = `${title}<small>${sub}</small>`;
+  d.innerHTML = sub ? `${title}<small>${sub}</small>` : title;
   hud.appendChild(d);
   d.addEventListener('animationend', () => { d.remove(); if (bannerQ.length && mode === 'play') banner(...bannerQ.shift(), true); });
 }

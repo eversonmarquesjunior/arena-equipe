@@ -11,10 +11,10 @@ const PALS = {
 };
 const ETYPES = {
   bug: { coins: [3, 5], name: 'Bug de Produção', hp: 50, w: 18, h: 14, dmg: 15, speed: 1.25, wind: 30 },
-  shield: { coins: [6, 8], name: 'Link Quebrado', hp: 70, w: 18, h: 14, dmg: 18, speed: .85, wind: 24, tip: 'o escudo bloqueia tudo de frente: role por cima e ataque pelas costas' },
-  ghost: { coins: [5, 7], name: 'Erro 404', hp: 45, w: 18, h: 14, dmg: 15, speed: 1.1, wind: 26, tip: 'some e reaparece atrás de você' },
-  flyer: { coins: [3, 4], name: 'Prazo Estourado', hp: 30, w: 14, h: 10, dmg: 12, fly: true, wind: 26, tip: 'mergulha do alto: role para desviar' },
-  shooter: { coins: [4, 6], name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32, tip: 'atira de longe: role ou pule os disparos' },
+  shield: { coins: [6, 8], name: 'Link Quebrado', hp: 70, w: 18, h: 14, dmg: 18, speed: .85, wind: 24 },
+  ghost: { coins: [5, 7], name: 'Erro 404', hp: 45, w: 18, h: 14, dmg: 15, speed: 1.1, wind: 26 },
+  flyer: { coins: [3, 4], name: 'Prazo Estourado', hp: 30, w: 14, h: 10, dmg: 12, fly: true, wind: 26 },
+  shooter: { coins: [4, 6], name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32 },
 };
 const WHITE_PAL = { shell: '#fff', hi: '#fff', dark: '#fff', belly: '#fff', eye: '#fff' };
 const E_LUNGE = 14, E_REST = 36, SPAWN_T = 36;
@@ -28,8 +28,8 @@ function spawnEnemy(type, tx, row, amb) {
   enemies.push(e);
   burst(e.x + e.w / 2, e.y + e.h / 2, 16, [e.pal.hi, e.pal.shell, '#ffffff'], 1.6, 0, [12, 22]);
   sfx.spawn();
-  // primeira vez que um tipo aparece: aviso de como lidar com ele
-  if (k.tip && !seenTypes.has(type)) { seenTypes.add(type); banner(k.name, k.tip, true); }
+  // primeira vez que um tipo aparece: mostra o nome dele
+  if (!seenTypes.has(type)) { seenTypes.add(type); banner(k.name, '', true); }
 }
 // pode ser atingido? (não enquanto surge nem quando o Erro 404 está sumido)
 const targetable = e => !e.dead && e.spawnT <= 0 && e.hidden <= 0;

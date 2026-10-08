@@ -88,26 +88,23 @@ defBiome('masmorra', {
   encounters: [
     { at: 47, list: [['bug', 58, 30]] },
     { at: 64, list: [['shooter', 99, 30]] },
-    { at: 86, list: [['flyer', 95, 10]] },
     { at: 108, list: [['shield', 122, 14]] },
-    { at: 140, list: [['ghost', 154, 34]] },
-    { at: 172, list: [['bug', 198, 25]] },
+    { at: 140, list: [['shooter', 158, 34], ['ghost', 154, 34]] },
+    { at: 172, list: [['flyer', 198, 17]] },
+    { at: 244, list: [['ghost', 256, 22]] },
     { at: 262, list: [['flyer', 287, 17]] },
     { at: 292, list: [['shooter', 313, 18]] },
     { at: 333, list: [['shield', 345, 8]] },
     { at: 422, list: [['flyer', 436, 9]] },
-    { at: 448, list: [['bug', 456, 18]] },
   ],
   // salas de emboscada: ao entrar, os portões (índices em gates) fecham e vêm ondas de inimigos
+  // uma onda só em cada: a primeira é tranquila, a segunda vem com mais bugs
   ambushes: [
     { at: 212, gates: [1, 2], waves: [
-      [['bug', 216, 22], ['bug', 236, 22], ['shield', 230, 22]],
-      [['flyer', 220, 12], ['ghost', 226, 22], ['shooter', 238, 22]],
+      [['bug', 220, 22], ['bug', 236, 22], ['shield', 230, 22]],
     ] },
     { at: 364, gates: [3, 4], waves: [
-      [['shield', 372, 18], ['bug', 380, 18], ['bug', 392, 18]],
-      [['ghost', 376, 18], ['shooter', 397, 18], ['flyer', 386, 8]],
-      [['shield', 368, 18], ['shield', 394, 18], ['flyer', 380, 6], ['shooter', 389, 18]],
+      [['shield', 372, 18], ['ghost', 376, 18], ['shooter', 397, 18], ['flyer', 386, 8]],
     ] },
   ],
 
