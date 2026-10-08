@@ -7,12 +7,12 @@ const GRAV = .32, MAXFALL = 6;   // inimigos e moedas
 const P_GRAV = .24, JUMP = 4.2, JUMP2 = 3.7, P_MAXFALL = 5.2;
 const COYOTE = 6, BUFFER = 7, ROLL_T = 20, ROLL_SPD = 3.4, ROLL_CD = 28;
 const pl = { x: 0, y: 0, w: 10, h: 28, vx: 0, vy: 0, face: 1, ground: false, coyote: 0, buf: 0, jumps: 0, cut: false, roll: 0, rollCd: 0, drop: 0, anim: 0, land: 0, safe: null,
-  hp: 100, max: 100, dmgMul: 1, scrolls: 0, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
+  hp: 100, max: 100, burn: 0, dmgMul: 1, scrolls: 0, inv: 0, hurt: 0, weapon: null, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0, carry: 50 };
 
 // coloca o herói no começo do bioma carregado (chame depois do resetLevel)
 function resetPlayer() {
   Object.assign(pl, { x: L.start.x, y: L.start.y - pl.h, vx: 0, vy: 0, face: 1, ground: false, roll: 0, rollCd: 0, drop: 0, jumps: 0, buf: 0, safe: { x: L.start.x, y: L.start.y - pl.h },
-    hp: pl.max, inv: 0, hurt: 0, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0 });
+    hp: pl.max, burn: 0, inv: 0, hurt: 0, atk: null, atkBuf: 0, heavyBuf: 0, combo: 0, comboT: 0, potions: 1, drink: 0 });
   snapCam();
 }
 
@@ -80,6 +80,16 @@ function updatePlayer() {
   if (pl.atkBuf > 0) pl.atkBuf--;
   if (pl.heavyBuf > 0) pl.heavyBuf--;
   if (pl.comboT > 0) pl.comboT--;
+  // queimadura do café: chamas no corpo e um pouco de dano a cada meio segundo, sem empurrão
+  if (pl.burn > 0) {
+    pl.burn--;
+    if (T % 3 === 0) addP(pl.x + rand(0, pl.w), pl.y + rand(4, pl.h), rand(-.2, .2), rand(-1, -.4), irand(12, 20), FIRE);
+    if (pl.burn % BURN_TICK === 0) {
+      pl.hp = Math.max(0, pl.hp - BURN_DMG); addNum(BURN_DMG, pl.x + pl.w / 2, pl.y - 4, '#ff8c1a');
+      sfx.sizzle(); renderHp();
+      if (pl.hp <= 0) { die(); return; }
+    }
+  }
 
   if (pl.roll > 0) {
     pl.roll--;
@@ -186,7 +196,8 @@ function chargeFx(a) {
 }
 function shootArrow(a, i = 0) {
   const s = a.s, r = a.aim * Math.PI / 180, ox = pl.x + pl.w / 2 + pl.face * 6, oy = pl.y + 12;
-  arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * s.speed, vy: Math.sin(r) * s.speed, s, life: 90, stuck: 0, hit: new Set(), heavy: a.heavy });
+  const crit = !!s.lastCrit && i === (s.burst ? s.burst[0] : 1) - 1;
+  arrows.push({ x: ox, y: oy, vx: Math.cos(r) * pl.face * s.speed, vy: Math.sin(r) * s.speed, s, life: 90, stuck: 0, hit: new Set(), heavy: a.heavy, crit });
   if (s.dart) { sfx.puff(); burst(ox, oy, a.heavy ? 6 : 3, ['#ffffff', '#c8ffb0', '#9dff6a'], 1, 0, [5, 10]); if (a.heavy && i === 0) shake = Math.max(shake, 1); return; }
   if (a.heavy) { sfx.big(); burst(ox, oy, 10, ['#ffffff', '#ffd23f'], 1.6); shake = Math.max(shake, 2); }
   if (s.bolt) sfx.crank(); else sfx.twang();
@@ -206,8 +217,8 @@ function updateArrows() {
       const e = enemies.find(o => targetable(o) && !ar.hit.has(o) && ar.x > o.x - 2 && ar.x < o.x + o.w + 2 && ar.y > o.y - 7 && ar.y < o.y + o.h + 2);
       if (e) {
         ar.hit.add(e);
-        const ok = hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1, ar.heavy, ar.s.alwaysCrit);
-        if (ok && ar.s.alwaysCrit) sfx.crit();
+        const ok = hitEnemy(e, ar.s, ar.vx < 0 ? -1 : 1, ar.heavy, ar.crit);
+        if (ok && ar.crit) sfx.crit();
         if (ar.s.explode) explodeAt(ar.x, ar.y, ar.s.explode, e);   // explode mesmo se bateu no escudo
         if (!ok || !ar.s.pierce) { ar.life = 0; ar.gone = true; return; }   // bateu no escudo, ou flecha comum: some; a perfurante segue
       }
@@ -325,7 +336,7 @@ function startDrink() {
 function finishDrink() {
   // a poção sempre enche a vida toda, não importa quanto falte
   const h = pl.max - pl.hp;
-  pl.potions--; pl.hp += h;
+  pl.potions--; pl.hp += h; pl.burn = 0;
   addNum(h, pl.x + pl.w / 2, pl.y - 4, '#4ade80');
   burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 22, ['#ffffff', '#c8ffd8', '#4ade80'], 1.6, -.03, [14, 26]);
   sfx.heal(); renderHp();

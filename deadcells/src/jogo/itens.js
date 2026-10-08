@@ -43,6 +43,12 @@ function openChest(c) {
     return;
   }
   burst(c.x, c.y - 8, 24, ['#ffffff', '#ffd23f', '#f5801e'], 2, -.02, [14, 26]);
+  // baú de poções: solta as poções no chão, sem escolha (dá para pegar todas)
+  if (c.potions) {
+    for (let i = 0; i < c.potions; i++) items.push({ kind: 'potion', x: c.x + (i - (c.potions - 1) / 2) * 14, y: c.y, lift: 26 });
+    banner('Baú aberto!', c.potions > 1 ? `${c.potions} poções de cura` : '1 poção de cura');
+    return;
+  }
   const g = 'chest' + c.tx;
   items.push({ kind: 'weapon', wid: c.wid, x: c.x - 12, y: c.y, group: g, lift: 26 });
   items.push({ kind: 'potion', x: c.x + 12, y: c.y, group: g, lift: 26 });

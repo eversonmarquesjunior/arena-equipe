@@ -59,9 +59,9 @@ const WEAPONS = {
   zarabatana: {
     name: 'Zarabatana', desc: 'Dardos envenenam o bug por 3 segundos; envenenado, ele leva o dobro de dano. Clique para mirar.', tint: '#9dff6a', idle: 10, run: 120,
     stats: [['Dano', 1], ['Velocidade', 3], ['Alcance', 3]],
-    heavyName: 'Rajada Tripla', heavyDesc: 'sopra 3 dardos seguidos, todos com dano crítico.',
-    // dart: dardo leve (cai pouco); poison: quadros de veneno; burst: [quantos dardos, quadros entre eles]
-    heavy: { ranged: true, dart: true, wind: 36, act: 13, rec: 14, dmg: 8, kb: .8, stop: 2, shake: 1, speed: 7, poison: 180, alwaysCrit: true, burst: [3, 6], arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
+    heavyName: 'Rajada Tripla', heavyDesc: 'sopra 3 dardos seguidos; o último dá dano crítico.',
+    // dart: dardo leve (cai pouco); poison: quadros de veneno; burst: [quantos dardos, quadros entre eles]; lastCrit: só o último dardo é crítico
+    heavy: { ranged: true, dart: true, wind: 36, act: 13, rec: 14, dmg: 8, kb: .8, stop: 2, shake: 1, speed: 7, poison: 180, lastCrit: true, burst: [3, 6], arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     combo: [
       { ranged: true, dart: true, wind: 9, act: 1, rec: 10, dmg: 8, kb: .6, stop: 1, shake: 0, speed: 7, poison: 180, arc: [0, 0], pw: 'draw', pa: 'loose', pr: 'loose' },
     ],

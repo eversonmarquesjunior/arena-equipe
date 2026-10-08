@@ -44,6 +44,7 @@ function draw() {
   enemies.forEach(e => drawEnemy(e, cx, cy));
   drawPet(cx, cy);
   shots.forEach(b => drawShot(b, cx, cy));
+  mugs.forEach(m => drawMug(m, cx, cy));
   arrows.forEach(ar => drawArrow(ar, cx, cy));
   frags.forEach(f => { R(Math.round(f.x - cx), Math.round(f.y - cy), 2, 1, T % 2 ? '#ffd23f' : '#ffffff'); });
   blasts.forEach(b => drawBlast(b, cx, cy));
@@ -353,15 +354,16 @@ function drawEnemy(e, cx, cy) {
   }
   if (e.spawnT > 0) lc.globalAlpha = T % 4 < 2 ? .25 : .25 + .75 * (1 - e.spawnT / SPAWN_T);
   else if (e.type === 'ghost' && e.st === 'chase' && e.hideCd < 40 && T % 6 < 3) lc.globalAlpha = .45;   // vai sumir
-  if (ETYPES[e.type].fly) drawFlyer(e, X, B); else drawBug(e, X, B);
+  const k = ETYPES[e.type];
+  if (k.fly) drawFlyer(e, X, B); else if (k.human) drawWorker(e, X, B); else drawBug(e, X, B);
   lc.globalAlpha = 1;
   if (e.spawnT > 0) return;
   // "!" de aviso: amarelo quando vai atacar, laranja quando acabou de te ver
   if (e.st === 'wind' || e.alert > 0) {
-    const ey = B - (ETYPES[e.type].fly ? 28 : 32) - ((T >> 3) % 2), col = e.st === 'wind' ? (e.t > e.windLen - 10 && T % 4 < 2 ? '#ffffff' : '#ffd23f') : '#f5801e';
+    const ey = B - (k.fly ? 28 : k.h + 18) - ((T >> 3) % 2), col = e.st === 'wind' ? (e.t > e.windLen - 10 && T % 4 < 2 ? '#ffffff' : '#ffd23f') : '#f5801e';
     R(X - 2, ey - 1, 5, 11, '#140a1f'); R(X - 1, ey, 3, 6, col); R(X - 1, ey + 7, 3, 2, col);
   }
-  if (e.barT > 0) { const by = B - (ETYPES[e.type].fly ? 16 : 20); R(X - 9, by, 18, 3, '#140a1f'); R(X - 8, by + 1, Math.max(0, Math.round(16 * e.hp / e.max)), 1, e.poison > 0 ? '#9dff6a' : '#ff4d6d'); }
+  if (e.barT > 0) { const by = B - (k.fly ? 16 : k.h + 6); R(X - 9, by, 18, 3, '#140a1f'); R(X - 8, by + 1, Math.max(0, Math.round(16 * e.hp / e.max)), 1, e.poison > 0 ? '#9dff6a' : '#ff4d6d'); }
 }
 // bug: casco oval, cabeça na frente (e.face), patinhas animadas
 function drawBug(e, X, B) {
@@ -438,6 +440,123 @@ function drawShot(b, cx, cy) {
   const x = Math.round(b.x - cx), y = Math.round(b.y - cy);
   if (x < -6 || x > W + 6 || y < -6 || y > H + 6) return;
   R(x - 2, y - 2, 5, 5, '#140a1f'); R(x - 1, y - 1, 3, 3, T % 4 < 2 ? '#ff4d6d' : '#fff176'); R(x, y, 1, 1, '#ffffff');
+}
+// funcionários zumbis do Ossuário: Segunda-feira (terno rasgado), Café Queimado (cinturão de xícaras) e Chefe no Corredor (óculos-laser)
+// todos curvados, com pele esverdeada, olho fundo brilhando, boca aberta, pontos na testa, roupa rasgada mostrando as costelas
+// desenhados virados para a direita (x maior = frente); B é a linha logo abaixo dos pés; o tamanho vem de ETYPES (h)
+const WORKER_LOOK = {
+  zombie: { skin: '#8fae7a', skinD: '#5e7a52', top: '#3a3f4a', topD: '#262a33', shirt: '#c8c4b4', pants: '#2e323b', shoe: '#151515', eye: '#ffef6a', hair: '#2a2a22' },
+  grenadier: { skin: '#a8b48a', skinD: '#6e7a58', top: '#5a3420', topD: '#3a2214', shirt: '#d8d0c0', pants: '#4a3a2e', shoe: '#1a120c', eye: '#ff6b3a', hair: '#3a2a1a' },
+  shocker: { skin: '#9aa88a', skinD: '#68765a', top: '#1f2a44', topD: '#141c30', shirt: '#e8e8e0', pants: '#1a2238', shoe: '#0a0a0a', eye: '#ff3030', hair: '#5a4a3a' },
+};
+const BONE = '#d8d0b8', BLOOD = '#7a1a1a', MOUTH = '#2a0a0a', SOCKET = '#1a0e12';
+function drawWorker(e, X, B) {
+  const f = e.face, white = e.flash > 0, k = ETYPES[e.type], S = WORKER_LOOK[e.type], H = k.h;
+  const C = c => white ? '#ffffff' : c;
+  const dk = (c, m) => '#' + [1, 3, 5].map(i => Math.round(parseInt(c.substr(i, 2), 16) * m).toString(16).padStart(2, '0')).join('');
+  const px = (x, y, c) => R(X + f * x - (f < 0 ? 1 : 0), B + y, 1, 1, C(c));
+  const rr = (x0, y0, x1, y1, c) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) px(x, y, c); };
+  const line = (x0, y0, x1, y1, c, th = 1) => {
+    const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+    for (let i = 0; i <= n; i++) { const x = Math.round(x0 + (x1 - x0) * i / n), y = Math.round(y0 + (y1 - y0) * i / n); rr(x, y, x, y + th - 1, c); }
+  };
+  // braço grosso (manga) com a mão em garra na ponta
+  const arm = (x0, y0, x1, y1, sleeve, hand, claw = true) => {
+    line(x0, y0, x1, y1, sleeve, 3);
+    const dx = Math.sign(x1 - x0) || 1;
+    rr(x1 + dx, y1, x1 + dx * 3, y1 + 2, hand);
+    if (claw) { px(x1 + dx * 4, y1, BONE); px(x1 + dx * 4, y1 + 2, BONE); }
+  };
+  const wind = e.st === 'wind', late = wind && e.t > e.windLen - 10, flick = T % 6 < 3;
+  const ph = Math.abs(e.vx) > .2 ? Math.floor(e.anim) % 2 : 0;
+  const headTop = -H, torsoTop = headTop + 9, legTop = -Math.round(H * .4);
+  // pose: quanto o corpo inclina para a frente (a arrancada do Segunda-feira inclina mais)
+  const dash = e.type === 'zombie' && e.st === 'lunge' && e.t < DASH_T - 8, strike = e.type === 'zombie' && e.st === 'lunge' && !dash;
+  const lean = dash ? 2 : strike ? 1 : 0;
+  const hx = (e.type === 'shocker' ? 1 : 2) + lean;     // curvado: cabeça para a frente
+  const sx = 2 + lean, sy = torsoTop + 2;              // ombro
+
+  // braço de trás (atrás do corpo, mais escuro)
+  if (e.type === 'zombie' && !dash && !strike) arm(sx - 2, sy + 3, sx + 4, sy + (wind ? -2 : 3), S.topD, S.skinD);
+  if (e.type === 'grenadier') arm(sx - 2, sy + 3, sx + 1, sy + 8, S.topD, S.skinD, false);
+  // pernas arrastando (a de trás mais escura) e a canela rasgada mostrando o osso
+  const bx = -4 - ph, fx = ph;
+  rr(bx, legTop, bx + 2, -3, dk(S.pants, .75)); rr(bx, -2, bx + 3, -1, S.shoe);
+  rr(fx, legTop, fx + 2, -3, S.pants); rr(fx, -2, fx + 3, -1, S.shoe);
+  rr(fx, -8, fx + 2, -6, S.skinD); px(fx + 1, -8, BONE); px(fx + 1, -7, BONE);
+  // tronco curvado: a parte de cima vai um pixel para a frente
+  for (let y = torsoTop; y < legTop; y++) {
+    const s = (y < torsoTop + 5 ? 1 : 0) + lean;
+    rr(-5 + s, y, 4 + s, y, S.top); px(-5 + s, y, S.topD);
+  }
+  for (let x = -5; x <= 4; x += 2) px(x + lean, legTop, S.top);   // barra rasgada
+  rr(1 + lean, torsoTop, 3 + lean, torsoTop + 5, S.shirt);         // camisa na gola
+  // rasgo na roupa com as costelas aparecendo e sangue escorrendo
+  rr(-3 + lean, torsoTop + 7, -1 + lean, torsoTop + 11, S.skinD);
+  [7, 9, 11].forEach(r => rr(-3 + lean, torsoTop + r, -1 + lean, torsoTop + r, BONE));
+  px(-2 + lean, torsoTop + 12, BLOOD); px(-2 + lean, torsoTop + 13, BLOOD); px(3 + lean, torsoTop + 4, BLOOD); px(2 + lean, torsoTop + 5, BLOOD);
+
+  // cabeça: pele esverdeada, olho fundo brilhando, boca aberta com dentes, pontos na testa
+  const eyeC = wind ? (late || flick ? '#ffffff' : S.eye) : e.st === 'beam' ? '#ffffff' : S.eye;
+  for (let r = 0; r < 9; r++) { const a = r === 8 ? 1 : 0; rr(hx - 3 + a, headTop + r, hx + 4, headTop + r, S.skin); px(hx - 3 + a, headTop + r, S.skinD); }
+  px(hx - 1, headTop + 4, S.skinD); px(hx - 1, headTop + 5, S.skinD);                  // orelha
+  rr(hx + 1, headTop + 3, hx + 3, headTop + 4, SOCKET); px(hx + 2, headTop + 3, eyeC); // olho fundo
+  px(hx + 4, headTop + 4, S.skinD); px(hx + 5, headTop + 5, S.skinD);                  // nariz
+  rr(hx + 1, headTop + 6, hx + 4, headTop + 7, MOUTH); px(hx + 2, headTop + 6, BONE); px(hx + 4, headTop + 6, BONE); px(hx + 3, headTop + 7, BONE);
+  px(hx + 3, headTop + 9, BLOOD);                                                       // baba de sangue
+  for (let x = hx - 1; x <= hx + 2; x++) px(x, headTop + 2, x % 2 ? S.skinD : '#2a1a1a'); // pontos na testa
+  px(hx, headTop + 1, '#2a1a1a'); px(hx + 2, headTop + 1, '#2a1a1a');
+
+  if (e.type === 'zombie') {
+    // Segunda-feira: cabelo falhado, gravata em farrapos
+    rr(hx - 3, headTop, hx + 2, headTop, S.hair); px(hx - 3, headTop + 1, S.hair); px(hx - 2, headTop + 1, S.hair); px(hx, headTop - 1, S.hair); px(hx - 2, headTop - 1, S.hair); px(hx + 3, headTop, S.skin);
+    px(2 + lean, torsoTop + 1, '#8a2028'); px(2 + lean, torsoTop + 2, '#8a2028'); px(3 + lean, torsoTop + 3, '#8a2028'); px(3 + lean, torsoTop + 4, '#8a2028'); px(4 + lean, torsoTop + 6, '#8a2028');
+    const bob = (T >> 4) % 2;
+    if (dash) arm(sx - 1, sy + 1, sx - 7, sy + 3, S.top, S.skin);                    // braços para trás na arrancada
+    else if (strike) arm(sx, sy, sx + 5, sy + 8, S.top, S.skin);                      // golpe de cima para baixo
+    else if (wind) arm(sx, sy + 1, sx + 4, sy - 5 - (late ? 1 : 0), S.top, S.skin);   // braços erguidos
+    else arm(sx, sy + bob, sx + 6, sy + bob, S.top, S.skin);                           // braços esticados de zumbi
+  } else if (e.type === 'grenadier') {
+    // Café Queimado: cabelo espetado, colete, cinturão de xícaras atravessado no peito
+    rr(hx - 3, headTop, hx + 1, headTop, S.hair); [-3, -1, 1].forEach(x => px(hx + x, headTop - 1, S.hair)); px(hx - 2, headTop - 2, S.hair); px(hx - 3, headTop + 1, S.hair);
+    for (let y = torsoTop + 1; y < legTop; y++) px(2 + (y < torsoTop + 5 ? 1 : 0), y, S.shirt);
+    for (let i = 0; i < 11; i++) px(-4 + i, torsoTop + 1 + i, '#2a1a0e');
+    const mug = '#f2f2f2', coffee = '#6b3a1a';
+    [[-3, 2], [0, 5], [3, 8]].forEach(([x, y]) => { rr(x, torsoTop + y, x + 1, torsoTop + y + 1, mug); px(x + 1, torsoTop + y, coffee); });
+    const cup = (x, y) => { rr(x, y, x + 3, y + 3, mug); rr(x, y, x + 3, y, coffee); px(x + 4, y + 1, mug); px(x + 4, y + 2, mug); };
+    const thrown = e.st === 'rest' && e.t < 14;
+    if (wind) { arm(sx - 1, sy + 1, sx - 5, sy - 5 - (late ? 1 : 0), S.top, S.skin, false); cup(sx - 10, sy - 9 - (late ? 1 : 0)); }
+    else if (thrown) arm(sx, sy, sx + 6, sy - 1, S.top, S.skin);
+    else { arm(sx, sy + 2, sx + 3, sy + 4, S.top, S.skin, false); cup(sx + 6, sy); }
+  } else {
+    // Chefe no Corredor: careca com manchas, bigode, óculos que brilham, gravata dourada, barriga
+    px(hx - 1, headTop, '#c8d4b0'); px(hx, headTop, '#c8d4b0'); px(hx - 1, headTop + 1, '#c8d4b0');   // brilho da careca
+    px(hx + 3, headTop + 1, S.skinD); px(hx - 2, headTop + 3, S.skinD);
+    px(hx - 3, headTop + 4, S.hair); px(hx - 3, headTop + 5, S.hair); px(hx - 3, headTop + 6, S.hair);
+    const lens = e.st === 'beam' ? '#ffffff' : wind ? (late || flick ? '#ff3030' : '#ff8a8a') : '#7a8aa0';
+    rr(hx, headTop + 3, hx + 4, headTop + 3, '#141414'); rr(hx + 1, headTop + 4, hx + 4, headTop + 4, lens); px(hx, headTop + 4, '#141414');
+    rr(hx + 2, headTop + 5, hx + 4, headTop + 5, '#3a2a1a');                         // bigode
+    for (let y = torsoTop + 1; y < torsoTop + 10; y++) px(2 + (y < torsoTop + 5 ? 1 : 0), y, '#c9a227');   // gravata
+    rr(5, torsoTop + 6, 5, legTop - 2, S.top);                                         // barriga
+    if (wind) { arm(sx, sy + 2, sx + 2, sy - 4, S.top, S.skin, false); }               // ajeitando os óculos
+    else if (e.st === 'beam') { arm(sx, sy + 1, sx + 5, sy + 4, S.top, S.skin); }
+    else { rr(-3, sy + 5, 4, sy + 7, S.top); rr(-3, sy + 7, 4, sy + 7, S.topD); rr(5, sy + 5, 6, sy + 7, S.skin); px(7, sy + 5, BONE); }   // braços cruzados
+    // aviso (linha pontilhada) e o laser
+    if (wind || e.st === 'beam') {
+      const beam = e.st === 'beam', cx = e.x + e.w / 2 - X, cy = e.y + e.h - B, [ox, oy] = eyePos(e), ax = ox - cx, ay = oy - cy, ex = e.beamX - cx, ey = e.beamY - cy;
+      const n = Math.max(1, Math.ceil(Math.hypot(ex - ax, ey - ay)));
+      for (let i = 0; i <= n; i++) {
+        const x = Math.round(ax + (ex - ax) * i / n), y = Math.round(ay + (ey - ay) * i / n);
+        if (beam) { R(x - 1, y - 1, 3, 3, '#ff3030'); R(x, y, 1, 1, '#ffffff'); }
+        else if (e.t > e.windLen - BEAM_LOCK - 24 && i % 4 < 2 && (late ? T % 4 < 2 : true)) R(x, y, 1, 1, late ? '#ffffff' : '#ff5050');
+      }
+    }
+  }
+}
+function drawMug(m, cx, cy) {
+  const x = Math.round(m.x - cx), y = Math.round(m.y - cy);
+  if (x < -6 || x > W + 6 || y < -6 || y > H + 6) return;
+  R(x - 3, y - 3, 6, 6, '#140a1f'); R(x - 2, y - 2, 4, 4, '#f2f2f2'); R(x - 2, y - 2, 4, 1, '#6b3a1a'); R(x + 2, y - 1, 2, 2, '#f2f2f2');
 }
 // números de dano em fonte de pixel 3x5
 const DIG = ['111101101101111', '110010010010111', '111001111100111', '111001011001111', '101101111001001', '111100111001111', '111100111101111', '111001010010010', '111101111101111', '111101111001111'];

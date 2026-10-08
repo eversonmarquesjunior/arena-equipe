@@ -8,14 +8,30 @@ const PALS = {
   ghost: { shell: '#b8862f', hi: '#f0cf7a', dark: '#352408', belly: '#7a5a1c', eye: '#5ee6ff' },
   flyer: { shell: '#2f7fb8', hi: '#86c8f0', dark: '#0c2438', belly: '#1f5579', eye: '#ff8c1a' },
   shooter: { shell: '#c9413b', hi: '#f59a7a', dark: '#360d0d', belly: '#852a26', eye: '#fff176' },
+  // funcionários do Ossuário (humanos, desenhados em drawWorker): as cores servem para as partículas e o piscar
+  zombie: { shell: '#3a3f4a', hi: '#8fae7a', dark: '#262a33', belly: '#d8d4c8', eye: '#ffef6a' },
+  grenadier: { shell: '#6b3f22', hi: '#e0b08a', dark: '#2e1a0e', belly: '#f2ece0', eye: '#ff6b3a' },
+  shocker: { shell: '#1f2a44', hi: '#d9a07a', dark: '#0e1424', belly: '#c9a227', eye: '#ff3030' },
 };
 const ETYPES = {
   bug: { coins: [3, 5], name: 'Bug de Produção', hp: 50, w: 18, h: 14, dmg: 15, speed: 1.25, wind: 30 },
   shield: { coins: [6, 8], name: 'Link Quebrado', hp: 70, w: 18, h: 14, dmg: 18, speed: .85, wind: 24 },
   ghost: { coins: [5, 7], name: 'Erro 404', hp: 45, w: 18, h: 14, dmg: 15, speed: 1.1, wind: 26 },
   flyer: { coins: [3, 4], name: 'Prazo Estourado', hp: 30, w: 14, h: 10, dmg: 12, fly: true, wind: 26 },
-  shooter: { coins: [4, 6], name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32 },
+  shooter: { coins: [4, 6], name: 'Arquivo Corrompido', hp: 40, w: 18, h: 14, dmg: 12, speed: .7, wind: 32, ranged: true, cd: 100 },
+  // human: desenhado como funcionário; ranged: mantém distância e ataca de longe; cd: espera depois de cada ataque
+  zombie: { coins: [6, 8], name: 'Segunda-feira', hp: 130, w: 16, h: 38, dmg: 18, speed: .55, wind: 34, human: true, cd: 70 },
+  grenadier: { coins: [5, 7], name: 'Café Queimado', hp: 110, w: 16, h: 36, dmg: 8, speed: .65, wind: 34, human: true, ranged: true, cd: 120 },
+  shocker: { coins: [8, 10], name: 'Chefe no Corredor', hp: 150, w: 18, h: 40, dmg: 20, speed: .5, wind: 56, human: true, ranged: true, cd: 130 },
 };
+// Segunda-feira: dash para a frente (distância em que começa, duração e velocidade)
+const DASH_RANGE = 92, DASH_T = 22, DASH_SPD = 4.6;
+// Chefe no Corredor: laser (a mira trava BEAM_LOCK passos antes do disparo)
+const BEAM_LOCK = 14, BEAM_T = 18, BEAM_LEN = 280;
+// Café Queimado: xícara em arco; quem é atingido queima por 3 s (BURN_DMG a cada BURN_TICK)
+const MUG_G = .12, MUG_SPD = 2.6, MUG_SPLASH = 16, BURN_T = 180, BURN_TICK = 30, BURN_DMG = 3;
+const FIRE = ['#fff3c2', '#ffb347', '#ff6b2e', '#8a2a1a'];
+let mugs = [];
 const WHITE_PAL = { shell: '#fff', hi: '#fff', dark: '#fff', belly: '#fff', eye: '#fff' };
 const E_LUNGE = 14, E_REST = 36, SPAWN_T = 36;
 let seenTypes = new Set(), shots = [];
@@ -67,36 +83,59 @@ function updateEnemy(e) {
       // o escudo vira devagar: dá tempo de rolar e atacar pelas costas
       if (Math.abs(dx) > 6 && Math.sign(dx) !== e.face) { if (++e.turnT > 28) { e.face = -e.face; e.turnT = 0; } } else e.turnT = 0;
     } else if (Math.abs(dx) > 6) e.face = Math.sign(dx);
-    if (e.type === 'shooter') {
+    if (k.ranged) {
       // mantém distância: foge se o herói chega perto, se aproxima se ele está longe
       const ad = Math.abs(dx);
-      target = ad < 60 ? -Math.sign(dx) * k.speed : ad > 130 ? Math.sign(dx) * k.speed : 0;
+      const near = e.type === 'shocker' ? 80 : 60, far = e.type === 'shocker' ? 110 : 130;
+      target = ad < near ? -Math.sign(dx) * k.speed : ad > far ? Math.sign(dx) * k.speed : 0;
       if (e.ground && target && ledge(e, Math.sign(target))) target = 0;
       if (sees && e.cd <= 0 && e.ground && Math.abs(dy) < 70) { e.st = 'wind'; e.t = 0; e.windLen = k.wind; sfx.warn(); }
     } else {
       target = Math.abs(dx) > 14 ? e.face * k.speed : 0;
       // na beirada: desce atrás do herói se lá embaixo tiver chão; só para diante de buraco sem fundo
       if (e.ground && ledge(e, e.face) && !(dy > -8 && floorBelow(e, e.face))) target = 0;
-      if (Math.abs(dx) < 34 && Math.abs(dy) < 20 && e.cd <= 0 && e.ground && Math.sign(dx) === e.face) { e.st = 'wind'; e.t = 0; e.windLen = k.wind; sfx.warn(); }
+      const reach = e.type === 'zombie' ? DASH_RANGE : 34;
+      if (Math.abs(dx) < reach && Math.abs(dy) < 20 && e.cd <= 0 && e.ground && Math.sign(dx) === e.face) { e.st = 'wind'; e.t = 0; e.windLen = k.wind; e.type === 'zombie' ? sfx.groan() : sfx.warn(); }
     }
     e.lost = sees ? 0 : e.lost + 1;
     if (!hunting || e.lost > 240) { e.st = 'patrol'; e.t = 0; }
   } else if (e.st === 'wind') {
     target = 0;
-    if (e.type === 'shooter' && Math.abs(dx) > 6) e.face = Math.sign(dx);
+    if (k.ranged && Math.abs(dx) > 6 && !(e.type === 'shocker' && e.t > e.windLen - BEAM_LOCK)) e.face = Math.sign(dx);
+    // Chefe no Corredor: os óculos acompanham o herói e a mira trava pouco antes do disparo
+    if (e.type === 'shocker') {
+      if (e.t <= e.windLen - BEAM_LOCK) { const [ox, oy] = eyePos(e); e.aim = Math.atan2(pl.y + 12 - oy, pl.x + pl.w / 2 - ox); }
+      if (e.t === e.windLen - BEAM_LOCK) sfx.charge(.25);
+      beamTrace(e);
+    }
     if (e.t >= e.windLen) {
       if (e.type === 'shooter') { shoot(e); e.st = 'rest'; e.t = 0; e.restLen = 24; }
+      else if (e.type === 'grenadier') { throwMug(e); e.st = 'rest'; e.t = 0; e.restLen = 30; }
+      else if (e.type === 'shocker') { e.st = 'beam'; e.t = 0; e.bit = false; sfx.laser(); shake = Math.max(shake, 2); }
+      else if (e.type === 'zombie') { e.st = 'lunge'; e.t = 0; e.vx = e.face * DASH_SPD; e.vy = -.6; e.bit = false; sfx.dash(); }
       else { e.st = 'lunge'; e.t = 0; e.vx = e.face * (e.type === 'shield' ? 2.6 : 3.6); e.vy = -1.4; e.bit = false; sfx.bite(); }
     }
   } else if (e.st === 'lunge') {
     if (e.ground && ledge(e, e.face) && !floorBelow(e, e.face)) e.vx = 0;
-    if (e.ground && e.t > 3) e.vx *= .9;
+    const zomb = e.type === 'zombie';
+    // Segunda-feira: arrancada reta e, no fim, o golpe com os braços (alcança um pouco mais à frente)
+    if (zomb && e.t < DASH_T - 8) { if (e.vx) e.vx = e.face * DASH_SPD; if (T % 2 === 0) addP(e.x + e.w / 2 - e.face * 6, e.y + rand(4, e.h), -e.face * .4, 0, 12, DUST); }
+    else if (e.ground && e.t > 3) e.vx *= .9;
+    const box = zomb ? { x: e.face > 0 ? e.x : e.x - 8, y: e.y, w: e.w + 8, h: e.h } : e;
     // rolando (ou ainda invencível) o bote passa direto: esquiva
-    if (!e.bit && mode === 'play' && overlap(e, pl)) { e.bit = true; if (!dodging() && pl.inv <= 0) hurtPlayer(k.dmg, e.face); }
-    if (e.t >= E_LUNGE) { e.st = 'rest'; e.t = 0; e.restLen = E_REST; }
+    if (!e.bit && mode === 'play' && overlap(box, pl)) { e.bit = true; if (!dodging() && pl.inv <= 0) hurtPlayer(k.dmg, e.face); }
+    if (e.t === DASH_T - 8 && zomb) sfx.swing();
+    if (e.t >= (zomb ? DASH_T : E_LUNGE)) { e.st = 'rest'; e.t = 0; e.restLen = zomb ? 44 : E_REST; }
+  } else if (e.st === 'beam') {
+    // Chefe no Corredor: o laser sai dos óculos na direção travada e para na primeira parede
+    target = 0;
+    beamTrace(e);
+    if (!e.bit && mode === 'play' && !dodging() && pl.inv <= 0 && beamHits(e)) { e.bit = true; hurtPlayer(k.dmg, Math.cos(e.aim) < 0 ? -1 : 1); }
+    if (T % 2 === 0) addP(e.beamX, e.beamY, rand(-1, 1), rand(-1, 1), 10, ['#ffffff', '#ff6b6b', '#ff3030']);
+    if (e.t >= BEAM_T) { e.st = 'rest'; e.t = 0; e.restLen = 40; }
   } else if (e.st === 'rest') {
     target = 0;
-    if (e.t >= e.restLen) { e.st = 'chase'; e.t = 0; e.cd = e.type === 'shooter' ? 100 : 50; }
+    if (e.t >= e.restLen) { e.st = 'chase'; e.t = 0; e.cd = k.cd || 50; }
   } else if (e.st === 'hurt') {
     if (e.ground) e.vx *= .85;
     if (e.t >= 16) { e.st = 'chase'; e.t = 0; e.cd = Math.max(e.cd, 20); }
@@ -105,7 +144,7 @@ function updateEnemy(e) {
   e.vy = Math.min(MAXFALL, e.vy + GRAV);
   if (moveX(e, e.vx)) {
     if (e.st === 'patrol') e.face *= -1;
-    else if (e.st === 'chase' && e.ground && e.type !== 'shooter') e.vy = -5;   // pula paredes de até 4 blocos atrás do herói
+    else if (e.st === 'chase' && e.ground && !k.ranged) e.vy = -5;   // pula paredes de até 4 blocos atrás do herói
   }
   e.ground = moveY(e, e.vy);
   if (e.ground) e.vy = 0;
@@ -128,7 +167,45 @@ function shoot(e) {
   e.vx = -e.face * .8; sfx.spit();
   burst(ox, oy, 6, [e.pal.eye, e.pal.shell], 1.2, 0, [6, 12]);
 }
+// Chefe no Corredor: ponto dos óculos, caminho do laser até a parede e se ele pega o herói
+const eyePos = e => [e.x + e.w / 2 + e.face * 4, e.y + 4];   // óculos (ver drawWorker)
+function beamTrace(e) {
+  const [ox, oy] = eyePos(e), c = Math.cos(e.aim || 0), s = Math.sin(e.aim || 0);
+  let d = 0;
+  while (d < BEAM_LEN && tile(Math.floor((ox + c * d) / TS), Math.floor((oy + s * d) / TS)) !== SOLID) d += 2;
+  e.beamX = ox + c * d; e.beamY = oy + s * d;
+}
+function beamHits(e) {
+  const [ox, oy] = eyePos(e), dx = e.beamX - ox, dy = e.beamY - oy, n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / 3));
+  for (let i = 0; i <= n; i++) { const x = ox + dx * i / n, y = oy + dy * i / n; if (x > pl.x - 2 && x < pl.x + pl.w + 2 && y > pl.y && y < pl.y + pl.h) return true; }
+  return false;
+}
+// Café Queimado: arremessa a xícara para a frente, num arco baixo que cai perto do herói (nunca sobe muito, para não bater no teto)
+function throwMug(e) {
+  const ox = e.x + e.w / 2 + e.face * 6, oy = e.y + 10, tx = pl.x + pl.w / 2 + pl.vx * 12, ty = pl.y + pl.h - 6;
+  const t = Math.max(12, Math.abs(tx - ox) / MUG_SPD);
+  mugs.push({ x: ox, y: oy, vx: e.face * MUG_SPD, vy: clamp((ty - oy - .5 * MUG_G * t * t) / t, -2.2, 1.5), t: 0 });
+  e.vx = -e.face * .6; sfx.toss();
+}
+function updateMugs() {
+  mugs.forEach(m => {
+    m.t++; m.vy = Math.min(6, m.vy + MUG_G); m.x += m.vx; m.y += m.vy;
+    if (T % 3 === 0) addP(m.x, m.y - 3, rand(-.1, .1), rand(-.5, -.2), 16, ['#ffffff', '#d8d0c8', '#8a8078']);   // vapor
+    const onHero = mode === 'play' && m.x > pl.x - 2 && m.x < pl.x + pl.w + 2 && m.y > pl.y && m.y < pl.y + pl.h;
+    const t = tile(Math.floor(m.x / TS), Math.floor((m.y + 2) / TS)), land = t === SOLID || (t === PLAT && m.vy > 0) || tile(Math.floor(m.x / TS), Math.floor(m.y / TS)) === SOLID;
+    if (!onHero && !land && m.y < MH * TS) return;
+    m.dead = true;
+    // a xícara quebra: café quente espirra em volta
+    burst(m.x, m.y, 14, ['#ffffff', '#c98a4a', '#6b3a1a', '#3a1e0e'], 1.8, .12, [10, 20]);
+    for (let i = 0; i < 6; i++) addP(m.x + rand(-6, 6), m.y, rand(-.3, .3), rand(-1.2, -.4), irand(16, 26), ['#ffffff', '#d8d0c8']);
+    sfx.shatter();
+    const near = Math.abs(pl.x + pl.w / 2 - m.x) < MUG_SPLASH && m.y > pl.y - 6 && m.y < pl.y + pl.h + MUG_SPLASH / 2;
+    if (mode === 'play' && (onHero || near) && !dodging() && pl.inv <= 0) { hurtPlayer(ETYPES.grenadier.dmg, Math.sign(pl.x + pl.w / 2 - m.x) || 1); pl.burn = BURN_T; }
+  });
+  mugs = mugs.filter(m => !m.dead);
+}
 function updateShots() {
+  updateMugs();
   shots.forEach(b => {
     b.x += b.vx; b.y += b.vy; b.life--;
     if (T % 2 === 0) addP(b.x, b.y, 0, 0, 8, ['#fff176', '#ff4d6d', '#852a26']);

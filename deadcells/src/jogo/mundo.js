@@ -35,7 +35,7 @@ const poolAt = o => L.pools.find(p => o.y + o.h > p.y * TS + 3 && o.x + o.w / 2 
 
 // partida nova: zera o estado de todos os biomas e volta para a Masmorra
 function resetLevel() {
-  enemies = []; shots = []; arrows = []; nums = []; coins = []; frags = []; blasts = []; seenTypes = new Set();
+  enemies = []; shots = []; mugs = []; arrows = []; nums = []; coins = []; frags = []; blasts = []; seenTypes = new Set();
   coinCount = 0;
   Object.values(BIOMES).forEach(B => {
     B.encounters.forEach(en => en.done = false);
@@ -51,12 +51,11 @@ function enterBiome(b) {
   const done = BIOMES[b].phase !== phase ? finishPhase() : null;   // passou para a próxima fase
   loadBiome(b); mode = 'play';
   const start = L.start;
-  enemies = []; shots = []; arrows = []; frags = []; blasts = []; ghosts = []; scrollFx = null;
+  enemies = []; shots = []; mugs = []; arrows = []; frags = []; blasts = []; ghosts = []; scrollFx = null;
   coins = [];   // moedas que ficaram no chão se perdem
-  Object.assign(pl, { x: start.x, y: start.y - pl.h, vx: 0, vy: 0, face: 1, atk: null, roll: 0, hurt: 0, drink: 0, inv: 0, atkBuf: 0, heavyBuf: 0 });
+  Object.assign(pl, { x: start.x, y: start.y - pl.h, vx: 0, vy: 0, face: 1, atk: null, roll: 0, hurt: 0, drink: 0, inv: 0, burn: 0, atkBuf: 0, heavyBuf: 0 });
   pl.safe = { x: pl.x, y: pl.y };
-  if (done) pet = null;   // o Alfredão acompanha só até o fim da fase
-  if (pet) Object.assign(pet, { x: pl.x - 10, y: pl.y - 8, vx: 0, vy: 0, st: 'follow', target: null });
+  if (pet) Object.assign(pet, { x: pl.x - 10, y: pl.y - 8, vx: 0, vy: 0, st: 'follow', target: null, gone: false });   // o Alfredão entrou na porta junto
   snapCam(); fade = -.8; keys.clear(); bannerQ.length = 0; renderTimer();
   burst(pl.x + pl.w / 2, pl.y + pl.h / 2, 26, ['#ffffff', '#ffd23f', CHARS[heroIdx].color], 2, 0, [12, 24]);
   sfx.teleport();

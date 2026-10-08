@@ -62,13 +62,33 @@ defBiome('ossuario', {
     carve(451, 14, 470, 25);
   },
 
+  // na sala da saída, preparação para a arena do chefe: baú com 2 poções e Baú de Poder (Pergaminho de Poder)
+  // e, no fim do corredor alto, um baú com 1 poção antes da emboscada final
+  chests: [{ tx: 356, row: 9, potions: 1 }, { tx: 453, row: 26, potions: 2 }, { tx: 457, row: 26, power: true }],
   // pontes de ossos que desabam: [coluna, linha, tamanho]
   crumbles: [[174, 27, 3], [283, 31, 4], [421, 23, 3], [427, 22, 3], [433, 23, 3], [439, 22, 3]],
 
-  // inimigos: ainda a definir (os salões 7 e 11 foram pensados para emboscadas)
-  // por enquanto, 3 Bugs de Produção logo depois da gaiola, para testar os rasantes do Alfredão
+  // inimigos: os funcionários do Ossuário (Segunda-feira, Café Queimado e Chefe no Corredor), apresentados um de cada vez
+  // encontros: quando o herói passa da coluna "at", os inimigos da lista surgem ([tipo, coluna, linha do chão])
   encounters: [
-    { at: 27, list: [['bug', 36, 34], ['bug', 46, 32], ['bug', 54, 34]] },
+    { at: 27, list: [['zombie', 50, 34]] },
+    { at: 64, list: [['zombie', 80, 34], ['zombie', 96, 34]] },
+    { at: 112, list: [['grenadier', 135, 14]] },
+    { at: 143, list: [['zombie', 150, 30], ['grenadier', 186, 30]] },
+    { at: 192, list: [['shocker', 210, 34]] },
+    { at: 262, list: [['zombie', 274, 34], ['shocker', 293, 34]] },
+    { at: 302, list: [['grenadier', 314, 17]] },
+    { at: 333, list: [['zombie', 352, 9]] },
+  ],
+  // portões das salas de emboscada (0 e 1: salão 7; 2 e 3: salão 11)
+  gates: [{ tx: 216, y0: 20, y1: 33 }, { tx: 250, y0: 20, y1: 33 }, { tx: 360, y0: 4, y1: 8 }, { tx: 411, y0: 14, y1: 25 }],
+  ambushes: [
+    { at: 221, gates: [0, 1], waves: [
+      [['zombie', 226, 34], ['zombie', 245, 34], ['grenadier', 233, 25]],
+    ] },
+    { at: 367, gates: [2, 3], waves: [
+      [['zombie', 378, 26], ['zombie', 392, 26], ['grenadier', 370, 21], ['grenadier', 401, 21], ['shocker', 404, 26]],
+    ] },
   ],
 
   torches: [[5, 25], [27, 25], [35, 28], [56, 28], [64, 24], [107, 10], [116, 10], [136, 10], [145, 22], [168, 22], [186, 22], [195, 18], [212, 26],
@@ -80,8 +100,8 @@ defBiome('ossuario', {
   petCage: { tx: 24, row: 18, len: 78, floor: 34 },
   // crânios e montes de ossos no chão: [coluna, linha do chão]
   skulls: [[3, 34], [12, 34], [29, 34], [38, 34], [58, 34], [63, 34], [108, 34], [118, 14], [147, 30], [185, 30], [208, 34], [217, 34], [249, 34],
-    [253, 34], [274, 34], [298, 34], [302, 34], [339, 9], [363, 26], [386, 26], [409, 26], [413, 26], [452, 26]],
-  bones: [[6, 34], [26, 34], [52, 34], [70, 34], [144, 30], [210, 34], [245, 34], [292, 34], [380, 26], [395, 26], [455, 26]],
+    [253, 34], [274, 34], [298, 34], [302, 34], [339, 9], [363, 26], [386, 26], [409, 26], [413, 26], [469, 26]],
+  bones: [[6, 34], [26, 34], [52, 34], [70, 34], [144, 30], [210, 34], [245, 34], [292, 34], [380, 26], [395, 26], [467, 26]],
   // arcos abertos ao fundo: [coluna do meio, linha de cima, linha do chão, raio em blocos]
   arches: [[74, 6, 34, 8], [275, 12, 34, 5], [385, 6, 26, 8]],
 

@@ -1,6 +1,6 @@
 // ===== Alfredão: o periquito preso na gaiola da entrada do Ossuário (petCage do bioma) =====
-// solto (E perto da gaiola), ele segue o herói até o fim da fase e dá rasantes nos bugs, como o Prazo Estourado
-// morreu, ele volta para a gaiola; ao passar de fase, ele fica para trás
+// solto (E perto da gaiola), ele segue o herói e dá rasantes nos bugs, como o Prazo Estourado
+// ele entra na porta junto com o herói e continua com ele nas outras fases; morreu, ele volta para a gaiola
 
 // desenho virado para a direita, 12 x 8; dois quadros de asa
 const PET_COLORS = { G: '#7ed321', g: '#4f9a1a', H: '#a6e84a', W: '#ffffff', K: '#141414', B: '#ecc8b0', b: '#c98a70', Y: '#ffd23f', P: '#f0a0a0', w: '#3f8a1a' };
@@ -94,6 +94,13 @@ function updatePet() {
   p.x += p.vx; p.y += p.vy;
 }
 
+// passando pela porta: voa até ela e some no clarão junto com o herói (reaparece no próximo bioma, no enterBiome)
+function updatePetExit() {
+  if (!pet || pet.gone) return;
+  const D = curDoor(), tx = D.x + D.w / 2, ty = D.y + D.h / 2;
+  pet.x += (tx - pet.x) * .12; pet.y += (ty - pet.y) * .12; pet.face = Math.sign(tx - pet.x) || pet.face;
+  if (exitT >= EXIT_GONE - 4) { pet.gone = true; burst(pet.x, pet.y, 12, ['#ffffff', '#a6e84a', '#ffd23f'], 1.6); }
+}
 function drawPetSprite(x, y, face, frame) {
   const F = PET_FRAMES[frame], X = Math.round(x), Y = Math.round(y) - 4;
   F.forEach((row, j) => { for (let i = 0; i < row.length; i++) { const c = row[i]; if (c !== '.') R(face > 0 ? X - 6 + i : X + 5 - i, Y + j, 1, 1, PET_COLORS[c]); } });
@@ -112,5 +119,5 @@ function drawPet(cx, cy) {
       else drawPetSprite(X, gy + 9 - ((T >> 4) % 2), (T >> 7) % 2 ? -1 : 1, 0);
     }
   }
-  if (pet) drawPetSprite(pet.x - cx, pet.y - cy, pet.face, pet.st === 'dive' ? 0 : (T >> 2) % 2);
+  if (pet && !pet.gone) drawPetSprite(pet.x - cx, pet.y - cy, pet.face, pet.st === 'dive' ? 0 : (T >> 2) % 2);
 }

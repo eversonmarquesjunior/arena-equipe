@@ -50,6 +50,7 @@ function update() {
 
 function updateExit() {
   exitT++;
+  updatePetExit();
   const cx = pl.x + pl.w / 2, cy = pl.y + pl.h / 2;
   if (exitT < EXIT_GONE) {
     const D = curDoor();

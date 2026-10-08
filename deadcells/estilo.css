@@ -89,13 +89,13 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
 .scrollPop .sline i{font-style:normal;font-size:.95em;color:#2f7a22;margin-left:.5em;background:#e6d39c;padding:0 .35em;border:1px solid #c9a96b}
 .scrollPop small{font-family:var(--mono);font-size:clamp(9px,1.1vw,12px);color:#6b4a2a}
 /* 8 s na tela: ~1 s de salto, fica parado até os 7,4 s e some */
-.scrollPop.show{animation:scrollJump 8s forwards}
+.scrollPop.show{animation:scrollJump 6.5s forwards}
 @keyframes scrollJump{
   0%{opacity:0;transform:translate(-50%,10%) scale(.2,.05) rotate(-10deg)}
-  5%{opacity:1;transform:translate(-50%,-70%) scale(1.15,1.15) rotate(3deg)}
-  8%{transform:translate(-50%,-45%) scale(.95,1.02) rotate(-1deg)}
-  10%{transform:translate(-50%,-52%) scale(1.02,.98) rotate(0)}
-  12%,93%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  6%{opacity:1;transform:translate(-50%,-70%) scale(1.15,1.15) rotate(3deg)}
+  10%{transform:translate(-50%,-45%) scale(.95,1.02) rotate(-1deg)}
+  12%{transform:translate(-50%,-52%) scale(1.02,.98) rotate(0)}
+  15%,91%{opacity:1;transform:translate(-50%,-50%) scale(1)}
   100%{opacity:0;transform:translate(-50%,-90%) scale(.9)}
 }
 kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line);padding:0 5px;font-size:.9em}

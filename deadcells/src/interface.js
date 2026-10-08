@@ -40,7 +40,8 @@ function updateTip() {
         $('tipAct').textContent = 'soltar';
         $('tipName').textContent = 'Alfredão'; $('tipDesc').textContent = 'Um periquito preso na gaiola. Solte e ele lutará ao seu lado a partir de agora!';
       } else if (it.tx !== undefined) {
-        if (it.power) { $('tipName').textContent = 'Baú de Poder'; $('tipDesc').textContent = 'Guarda um Pergaminho de Poder: +20% de vida máxima e dano ×1,5 com qualquer arma.'; }
+        if (it.potions) { $('tipName').textContent = 'Baú'; $('tipDesc').textContent = it.potions > 1 ? `Guarda ${it.potions} poções de cura.` : 'Guarda 1 poção de cura.'; }
+        else if (it.power) { $('tipName').textContent = 'Baú de Poder'; $('tipDesc').textContent = 'Guarda um Pergaminho de Poder: +20% de vida máxima e dano ×1,5 com qualquer arma.'; }
         else { $('tipName').textContent = 'Baú'; $('tipDesc').textContent = 'Guarda uma arma nova e uma poção de cura. Você só pode levar uma das duas.'; }
       } else if (it.kind === 'potion') {
         $('tipName').textContent = 'Poção de cura'; $('tipDesc').textContent = 'Enche toda a vida quando você bebe (Q).';
