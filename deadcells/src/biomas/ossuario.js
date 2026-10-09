@@ -62,9 +62,9 @@ defBiome('ossuario', {
     carve(451, 14, 470, 25);
   },
 
-  // na sala da saída, preparação para a arena do chefe: baú com 2 poções e Baú de Poder (Pergaminho de Poder)
-  // e, no fim do corredor alto, um baú com 1 poção antes da emboscada final
-  chests: [{ tx: 356, row: 9, potions: 1 }, { tx: 453, row: 26, potions: 2 }, { tx: 457, row: 26, power: true }],
+  // Baú de Poder (Pergaminho de Poder) no canto do pé da torre, logo depois do segundo arco;
+  // no fim do corredor alto, um baú com 1 poção antes da emboscada final; na sala da saída, baú com 2 poções
+  chests: [{ tx: 327, row: 34, power: true }, { tx: 356, row: 9, potions: 1 }, { tx: 455, row: 26, potions: 2 }],
   // pontes de ossos que desabam: [coluna, linha, tamanho]
   crumbles: [[174, 27, 3], [283, 31, 4], [421, 23, 3], [427, 22, 3], [433, 23, 3], [439, 22, 3]],
 
